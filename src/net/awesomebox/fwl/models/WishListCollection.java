@@ -25,8 +25,14 @@ public class WishListCollection
 	public final WishList[] getWishLists() { return wishLists; }
 	
 	
+	
+	public static WishListCollection getByID(int id)
+	{
+		return null;
+	}
+	
 	public static WishListCollection[] getByCreator(int creatorUserId)
 	{
-		return new WishListCollection[0];
+		return null;
 	}
 }

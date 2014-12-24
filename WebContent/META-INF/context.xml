@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+
+<Context antiJARLocking="true" path="/fwl" allowLinking="true" aliases="/data=/etc/fwl">
+
+	<Resource name="jdbc/postgres" auth="Container"
+		type="javax.sql.DataSource"
+		driverClassName="org.postgresql.Driver"
+		url="jdbc:postgresql://localhost:5432/fwl"
+		factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+		username="fwl_user"
+		password="fwl_user111111"
+		maxActive="20"
+		maxIdle="5"
+		maxWait="-1"
+		removeAbandoned="true"
+		removeAbandonedTimeout="60"
+		logAbandoned="true"
+	/>
+
+</Context>

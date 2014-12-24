@@ -7,6 +7,7 @@ public class WishListItem
 	public final String  url;
 	public final String  imageURL;
 	public final Integer coveredByUserID;
+	public final boolean fulfilled;
 	public final int     priority;
 	
 	private WishList wishList;
@@ -18,13 +19,15 @@ public class WishListItem
 		String  url,
 		String  imageURL,
 		Integer coveredByUserID,
+		boolean fulfilled,
 		int     priority
 	)
 	{
 		this.id              = id;
 		this.wishListID      = wishListID;
 		this.url             = url;
-        this.imageURL        = imageURL;        this.coveredByUserID = coveredByUserID;        this.priority        = priority;
+        this.imageURL        = imageURL;        this.coveredByUserID = coveredByUserID;
+        this.fulfilled       = fulfilled;        this.priority        = priority;
 	}
 	
 	public final WishList getWishList() { return wishList; }

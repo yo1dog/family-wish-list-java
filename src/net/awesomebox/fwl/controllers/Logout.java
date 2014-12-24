@@ -10,25 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.awesomebox.fwl.AuthManager;
 import net.awesomebox.fwl.FWLManagedHttpServlet;
-import net.awesomebox.fwl.models.User;
 
-@WebServlet("/home")
-public class Home extends FWLManagedHttpServlet
+@WebServlet("/logout")
+public class Logout extends FWLManagedHttpServlet
 {
 	private static final long serialVersionUID = 1L;
 	
 	@Override
 	protected void _doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException
 	{
-		User loggedInUser = AuthManager.getLoggedInUser(getDatabaseConnection(), request);
-		
-		if (loggedInUser == null)
-			request.getRequestDispatcher("WEB-INF/jsp/login.jsp").forward(request, response);
-		else
-		{
-			request.setAttribute("loggedInUser", loggedInUser);
-			
-			request.getRequestDispatcher("WEB-INF/jsp/profile.jsp").forward(request, response);
-		}
+		AuthManager.unsetLoggedInUser(request);
+		response.sendRedirect("/home");
 	}
 }
