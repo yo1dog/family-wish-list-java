@@ -1,0 +1,16 @@
+body
+{
+	font-family: sans-serif;
+}
+
+table
+{
+	border-collapse: collapse;
+}
+
+.wishlist th, .wishlist td
+{
+	margin: 0px;
+	border: 1px solid #000000;
+	padding: 10px;
+}

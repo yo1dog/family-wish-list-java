@@ -1,4 +1,4 @@
-package net.awesomebox.fwl.controllers;
+package net.awesomebox.fwl.controllers.auth;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -28,22 +28,22 @@ public class Register extends FWLManagedHttpServlet
 	protected void _doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException
 	{
 		// check if they are already logged in
-		User loggedInUser = AuthManager.getLoggedInUser(getDatabaseConnection(), request);
+		User loggedInUser = AuthManager.getLoggedInUser(request);
 		if (loggedInUser != null)
 		{
 			response.sendRedirect("/home");
 			return;
 		}
 		
-		request.getRequestDispatcher("WEB-INF/jsp/register.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/jsp/auth/register.jsp").forward(request, response);
 	}
 	
 	@Override
 	protected void _doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException
 	{
 		// check if they are already logged in
-		Connection cn = getDatabaseConnection();
-		User loggedInUser = AuthManager.getLoggedInUser(cn, request);
+		Connection cn = getDatabaseConnection(request);
+		User loggedInUser = AuthManager.getLoggedInUser(request);
 		
 		if (loggedInUser != null)
 		{
@@ -62,7 +62,6 @@ public class Register extends FWLManagedHttpServlet
 		formData.put("firstName", firstName);
 		formData.put("lastName" , lastName);
 		formData.put("email"    , email);
-		formData.put("password" , password);
 		
 		if (firstName == null)
 		{
@@ -104,11 +103,12 @@ public class Register extends FWLManagedHttpServlet
 		if (userID == -1)
 		{
 			returnFormErrorMessage("Email already in use.", formData, request, response);
+			return;
 		}
 		
 		
 		// set session
-		AuthManager.setLoggedInUser(request, userID);
+		AuthManager.setSessionLoggedInUserID(request, userID);
 		
 		response.sendRedirect("/home");
 	}
@@ -118,6 +118,6 @@ public class Register extends FWLManagedHttpServlet
 		request.setAttribute("formErrorMessage", formErrorMessage);
 		request.setAttribute("formData", formData);
 		
-		request.getRequestDispatcher("WEB-INF/jsp/register.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/jsp/auth/register.jsp").forward(request, response);
 	}
 }

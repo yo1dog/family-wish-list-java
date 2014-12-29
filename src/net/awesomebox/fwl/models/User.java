@@ -45,7 +45,14 @@ public class User
 	}
 	
 	
-	public final WishListCollection[] getCollections() { return new WishListCollection[0]; }
+	public final WishListCollection[] getCollections(Connection cn) throws SQLException {
+		if (collections == null) {
+			collections = WishListCollection.getListByMember(cn, id);
+		}
+		
+		return collections;
+	}
+	
 	
 	
 	public static User getByID(Connection cn, int userID) throws SQLException

@@ -1,4 +1,4 @@
-package net.awesomebox.fwl.controllers;
+package net.awesomebox.fwl.controllers.auth;
 
 import java.io.IOException;
 import java.sql.SQLException;

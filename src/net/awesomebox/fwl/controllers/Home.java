@@ -20,15 +20,14 @@ public class Home extends FWLManagedHttpServlet
 	@Override
 	protected void _doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException
 	{
-		User loggedInUser = AuthManager.getLoggedInUser(getDatabaseConnection(), request);
+		User loggedInUser = AuthManager.getLoggedInUser(request);
 		
 		if (loggedInUser == null)
-			request.getRequestDispatcher("WEB-INF/jsp/login.jsp").forward(request, response);
+			request.getRequestDispatcher("/WEB-INF/jsp/auth/login.jsp").forward(request, response);
 		else
 		{
-			request.setAttribute("loggedInUser", loggedInUser);
-			
-			request.getRequestDispatcher("WEB-INF/jsp/profile.jsp").forward(request, response);
+			request.setAttribute("cn", getDatabaseConnection(request));
+			request.getRequestDispatcher("/WEB-INF/jsp/user/profile.jsp").forward(request, response);
 		}
 	}
 }

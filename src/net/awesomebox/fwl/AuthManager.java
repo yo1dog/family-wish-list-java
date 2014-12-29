@@ -1,9 +1,7 @@
 package net.awesomebox.fwl;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -12,47 +10,63 @@ import net.awesomebox.servletmanager.exceptions.UnauthorizedException;
 
 public class AuthManager
 {
-	public static void setLoggedInUser(HttpServletRequest request, int userID)
-	{
-		HttpSession session = request.getSession(true);
-		session.setAttribute("userID", new Integer(userID));
-	}
-	
-	public static void unsetLoggedInUser(HttpServletRequest request)
-	{
-		HttpSession session = request.getSession(false);
-		if (session != null)
-			session.setAttribute("userID", null);
-	}
-	
-	public static User getLoggedInUser(Connection cn, HttpServletRequest request) throws SQLException
+	public static Integer getSessionLoggedInUserID(HttpServletRequest request) throws SQLException
 	{
 		HttpSession session = request.getSession(false);
 		
 		if (session == null)
 			return null;
         
-		Integer userID = (Integer)session.getAttribute("userID");
-		
-		if (userID == null)
-			return null;
-		
-		// lookup user in DB
-		User user = User.getByID(cn, userID);
-		
-		if (user == null)
-		{
-			session.setAttribute("userID", null);
-			return null;
-			
-		}
-		
-		return user;
+		return (Integer)session.getAttribute("userID");
 	}
 	
-	public static User requireLoggedInUser(Connection cn, HttpServletRequest request) throws ServletException, SQLException
+	public static void setSessionLoggedInUserID(HttpServletRequest request, int userID)
 	{
-		User loggedInUser = getLoggedInUser(cn, request);
+		HttpSession session = request.getSession(true);
+		session.setAttribute("userID", new Integer(userID));
+	}
+	
+	public static void unsetSessionLoggedInUserID(HttpServletRequest request)
+	{
+		HttpSession session = request.getSession(false);
+		if (session != null)
+			session.setAttribute("userID", null);
+	}
+	
+	
+	
+	public static void setRequestLoggedInUser(HttpServletRequest request, User loggedInUser)
+	{
+		request.setAttribute("loggedInUser", loggedInUser);
+	}
+	public static void unsetRequestLoggedInUser(HttpServletRequest request)
+	{
+		request.setAttribute("loggedInUser", null);
+	}
+	
+	
+	
+	public static void setLoggedInUser(HttpServletRequest request, User user)
+	{
+		setSessionLoggedInUserID(request, user.id);
+		setRequestLoggedInUser(request, user);
+	}
+	
+	public static void unsetLoggedInUser(HttpServletRequest request)
+	{
+		unsetSessionLoggedInUserID(request);
+		unsetRequestLoggedInUser(request);
+	}
+	
+	public static User getLoggedInUser(HttpServletRequest request)
+	{
+		return (User)request.getAttribute("loggedInUser");
+	}
+	
+	
+	public static User requireLoggedInUser(HttpServletRequest request) throws UnauthorizedException
+	{
+		User loggedInUser = getLoggedInUser(request);
 		
 		if (loggedInUser == null)
 			throw new UnauthorizedException();
