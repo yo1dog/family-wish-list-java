@@ -1,20 +1,15 @@
 package net.awesomebox.fwl;
 
-import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.awesomebox.fwl.database.Database;
 import net.awesomebox.fwl.models.User;
 import net.awesomebox.servletmanager.ManagedHttpServlet;
-import net.awesomebox.servletmanager.ManagedServletException;
-import net.awesomebox.servletmanager.exceptions.UnauthorizedException;
 
 public class FWLManagedHttpServlet extends ManagedHttpServlet
 {
@@ -27,7 +22,7 @@ public class FWLManagedHttpServlet extends ManagedHttpServlet
 		
 		if (loggedInUserID != null)
 		{
-			User loggedInUser = User.getByID(getDatabaseConnection(request), loggedInUserID);
+			User loggedInUser = User.findByID(getDatabaseConnection(request), loggedInUserID);
 			
 			if (loggedInUser == null)
 				AuthManager.unsetSessionLoggedInUserID(request);
@@ -56,26 +51,6 @@ public class FWLManagedHttpServlet extends ManagedHttpServlet
 			// ALWAYS close the database connection!
 			closeDatabaseConnection(request);
 		}
-	}
-	
-	
-	@Override
-	protected boolean onManagedServletException(HttpServletRequest request, HttpServletResponse response, HttpMethod method, ManagedServletException e) throws ServletException, IOException
-	{
-		if (e instanceof UnauthorizedException)
-		{
-			String path = request.getRequestURI();
-			String queryString = request.getQueryString();
-			
-			String callbackURL = path;
-			if (queryString != null)
-				callbackURL += "?" + queryString;
-			
-			response.sendRedirect("/login?callbackURL=" + URLEncoder.encode(callbackURL, "UTF-8"));
-			return true;
-		}
-		
-		return super.onManagedServletException(request, response, method, e);
 	}
 
 	

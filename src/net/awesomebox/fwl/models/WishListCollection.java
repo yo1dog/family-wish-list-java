@@ -39,14 +39,14 @@ public class WishListCollection
 	public final WishList[] getWishLists(Connection cn) throws SQLException
 	{
 		if (wishLists == null)
-			wishLists = WishList.getListByCollection(cn, id);
+			wishLists = WishList.findListByCollection(cn, id);
 		
 		return wishLists;
 	}
 	
 	
 	
-	public static WishListCollection getByID(Connection cn, int collectionID) throws SQLException
+	public static WishListCollection findByID(Connection cn, int collectionID) throws SQLException
 	{
 		PreparedStatement st = cn.prepareStatement("SELECT * FROM wish_list_collections WHERE id = ?");
 		st.setInt(1, collectionID);
@@ -63,7 +63,7 @@ public class WishListCollection
 		return collection;
 	}
 	
-	public static WishListCollection[] getListByCreator(Connection cn, int creatorUserID) throws SQLException
+	public static WishListCollection[] findListByCreator(Connection cn, int creatorUserID) throws SQLException
 	{
 		ArrayList<WishListCollection> collections = new ArrayList<WishListCollection>();
 		
@@ -81,7 +81,7 @@ public class WishListCollection
 		return collections.toArray(new WishListCollection[collections.size()]);
 	}
 	
-	public static WishListCollection[] getListByMember(Connection cn, int userID) throws SQLException
+	public static WishListCollection[] findListByMember(Connection cn, int userID) throws SQLException
 	{
 		ArrayList<WishListCollection> collections = new ArrayList<WishListCollection>();
 		

@@ -11,111 +11,232 @@ Connection cn = (Connection)request.getAttribute("cn");
 User loggedInUser = (User)request.getAttribute("loggedInUser");
 
 WishList           wishList      = (WishList)request.getAttribute("wishList");
-WishListItem[]     items         = wishList.getItems(cn);
 WishListCollection collection    = wishList.getCollection(cn);
 User               wishListOwner = wishList.getOwner(cn);
+
+WishListItem[] itemsByWishListOwner = (WishListItem[])request.getAttribute("itemsByWishListOwner");
+WishListItem[] itemsByOthers        = (WishListItem[])request.getAttribute("itemsByOthers");
 
 boolean isLoggedInUsersWishList = wishListOwner.id == loggedInUser.id;
 
 String listNameEscaped;
 if (isLoggedInUsersWishList)
-	listNameEscaped = "Your";
+  listNameEscaped = "Your";
 else
 {
-	char lastChar = wishListOwner.firstName.charAt(wishListOwner.firstName.length() - 1);
-	listNameEscaped = wishListOwner.firstName + ((lastChar == 's' || lastChar == 'S')? "'" : "'s");
+  char lastChar = wishListOwner.firstName.charAt(wishListOwner.firstName.length() - 1);
+  listNameEscaped = wishListOwner.firstName + ((lastChar == 's' || lastChar == 'S')? "'" : "'s");
 }
 %>
 
-<t:header />
+<t:header>
+  <jsp:attribute name="head">
+    <script type="text/javascript" src="/js/ajax.js"></script>
+    <script type="text/javascript" src="/js/script.js"></script>
+    
+    <script type="text/javascript">
+      function setItemCovered(itemID, fulfilled) {
+        setItemStatusHTML(itemID, "...");
+        
+        ItemUpdater.setCovered(itemID, fulfilled, function(err) {
+          if (err) {
+            console.error(err);
+            
+            setItemStatusHTML(itemID, "Oops, something went wrong. Please try again latter.");
+            return;
+          }
+          
+          var statusHTML = "<strong>You</strong> ";
+          var rowClass = "";
+          
+          if (fulfilled) {
+            statusHTML += "got this. - <a href=\"javascript:setItemCovered(" + itemID + ", false);\">Actually, I haven't got it yet.</a>";
+            rowClass = "item-user-covered-fulfilled";
+          }
+          else {
+            statusHTML += "plan on getting this. - <a href=\"javascript:setItemCovered(" + itemID + ", true);\">Got it.</a> - <a href=\"javascript:setItemUncovered(" + itemID + ");\">I'm not going to get this.</a>";
+            rowClass = "item-user-covered-unfulfilled";
+          }
+          
+          setItemStatusHTML(itemID, statusHTML);
+          setItemRowClass(itemID, rowClass);
+        });
+      }
+      
+      function setItemUncovered(itemID) {
+        setItemStatusHTML(itemID, "...");
+        
+        ItemUpdater.setCovered(itemID, null, function(err) {
+          if (err) {
+            console.error(err);
+            
+            setItemStatusHTML(itemID, "Oops, something went wrong. Please try again latter.");
+            return;
+          }
+          
+          
+          var statusHTML = "No one is getting this. <a href=\"javascript:setItemCovered(" + itemID + ", false);\">I'll get this.</a> - <a href=\"javascript:setItemCovered(" + itemID + ", true);\">I already got this.</a>";
+          setItemStatusHTML(itemID, statusHTML);
+          setItemRowClass(itemID, "");
+        });
+      }
+      
+      function setItemStatusHTML(itemID, html) {
+        var itemStatusCell = document.getElementById("itemStatusCell" + itemID);
+        itemStatusCell.innerHTML = html;
+      }
+      
+      function setItemRowClass(itemID, klass) {
+        var itemRow = document.getElementById("item" + itemID);
+        itemRow.className = klass;
+      }
+    </script>
+  </jsp:attribute>
+</t:header>
 <h2><a href="/collection?id=<%=collection.id%>"><%=ServletHelper.escapeHTML(collection.name)%></a> - <%=listNameEscaped%> Wish List</h2>
 
-<%
-if (isLoggedInUsersWishList)
-{
-	%><a href="/item/create?wishListID=<%=wishList.id%>">Add Item</a><br /><%
-}
+<a href="/item/create?wishListID=<%=wishList.id%>">Add Item</a><br />
+<br />
 
-// show message if there are no items
-if (items.length == 0)
-{
-	if (isLoggedInUsersWishList)
-	{
-		%><p>You have no items on your list. Add items by clicking the <strong>Add Item</strong> link above.<p><%
-	}
-	else
-	{
-		%><p>There are no items on this list. Tell <%=ServletHelper.escapeHTML(wishListOwner.firstName)%> to add some!<p><%
-	}
-}
-// show the items
-else
-{
-	%>
-	<br />
-	<table class="wishlist">
-		<thead>
-			<tr>
-				<th>Image</th>
-				<th>Name</th>
-				<th>Description</th>
-				<th>Status</th>
-			</tr>
-		</thead>
-		<tbody>
-		<%
-		for (int i = 0; i < items.length; ++i)
-		{
-			WishListItem item = items[i];
-			
-			String urlEscaped = null;
-			if (item.url != null)
-				urlEscaped = ServletHelper.escapeHTML(item.url);
-			
-			// image
-			String imageHTML = "";
-			if (item.imageURL != null)
-			{
-				imageHTML = "<img src=\"" + ServletHelper.escapeHTML(item.imageURL) + "\" />";
-				
-				if (item.url != null)
-					imageHTML = "<a href=\"" + urlEscaped + "\">" + imageHTML + "</a>";
-			}
-			
-			// name
-			String nameHTML = ServletHelper.escapeHTML(item.name);
-			if (item.url != null)
-				nameHTML = "<a href=\"" + urlEscaped + "\">" + nameHTML + "</a>";
-			
-			// description
-			String descriptionHTML = "";
-			if (item.description != null)
-				descriptionHTML = ServletHelper.newlinesToBR(ServletHelper.escapeHTML(item.description));
-			
-			// covered
-			String coveredHTML = "";
-			
-			// dont show if it is the logged-in user's wishlist
-			if (!isLoggedInUsersWishList)
-			{
-				User coveredByUser = item.getCoveredByUser(cn);
-				
-				if (coveredByUser != null)
-					coveredHTML = ServletHelper.escapeHTML(coveredByUser.firstName) + " " + (item.fulfilled? "got this." : "plans on getting this.");
-			}
-			%>
-			<tr>
-				<td><%=imageHTML%></td>
-				<td><%=nameHTML%></td>
-				<td><%=descriptionHTML%></td>
-				<td><%=coveredHTML%></td>
-			</tr>
-			<%
-		}
-		%>
-		</tbody>
-	</table>
-	<%
-}
-%>
+<table class="wishlist">
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%
+    for (int r = 0; r < 2; ++r)
+    {
+      boolean firstPass = r == 0;
+      WishListItem[] items;
+      
+      if (firstPass)
+      {
+        // show items from the wish list owner first
+        items = itemsByWishListOwner;
+        
+        // show message if there are none
+        if (items.length == 0)
+        {
+        	String messageHTML;
+        	
+	        if (isLoggedInUsersWishList)
+	        	messageHTML = "You have no items on your list. Add items by clicking the <strong>Add Item</strong> link above.";
+	        else
+	          messageHTML = ServletHelper.escapeHTML(wishListOwner.firstName) + " has not added any items.";
+	        
+	        %>
+	        <tr>
+	          <td colspan="4"><%=messageHTML%></td>
+	        </tr>
+	        <%
+	        
+	        continue;
+        }
+      }
+      else
+      {
+        // show items from others next
+        // don't show if it is the logged-in user's list
+        if (isLoggedInUsersWishList)
+        	continue;
+        
+        items = itemsByOthers;
+        
+        // skip if there are none
+        if (items.length == 0)
+          continue;
+        
+        %>
+        <tr>
+          <td colspan="4">Added by Others</td>
+        </tr>
+        <%
+      }
+      
+      for (int i = 0; i < items.length; ++i)
+      {
+        WishListItem item = items[i];
+        
+        String urlEscaped = null;
+        if (item.url != null)
+          urlEscaped = ServletHelper.escapeHTML(item.url);
+        
+        // image
+        String imageHTML = "";
+        if (item.imageURL.length() > 0)
+        {
+          imageHTML = "<img src=\"" + ServletHelper.escapeHTML(item.imageURL) + "\" />";
+          
+          if (item.url.length() > 0)
+            imageHTML = "<a href=\"" + urlEscaped + "\">" + imageHTML + "</a>";
+        }
+        
+        // name
+        String nameHTML = ServletHelper.escapeHTML(item.name);
+        if (item.url.length() > 0)
+          nameHTML = "<a href=\"" + urlEscaped + "\">" + nameHTML + "</a>";
+        
+        // description
+        String descriptionHTML = "";
+        if (item.description.length() > 0)
+          descriptionHTML = ServletHelper.newlinesToBR(ServletHelper.escapeHTML(item.description));
+        
+        // status
+        String rowClass = "";
+        String statusHTML = "";
+        
+        // dont show if it is the logged-in user's wishlist
+        if (!isLoggedInUsersWishList)
+        {
+          User coveredByUser = item.getCoveredByUser(cn);
+          
+          if (coveredByUser == null)
+            statusHTML = "No one is getting this. <a href=\"javascript:setItemCovered(" + item.id + ", false);\">I'll get this.</a> - <a href=\"javascript:setItemCovered(" + item.id + ", true);\">I already got this.</a>";
+          else
+          {
+            boolean isCoveredByCurrentUser = coveredByUser.id == loggedInUser.id;
+            
+            if (isCoveredByCurrentUser)
+            {
+              statusHTML = "<strong>You</strong> ";
+              
+              if (item.fulfilled)
+                statusHTML += "got this. - <a href=\"javascript:setItemCovered(" + item.id + ", false);\">Actually, I haven't got it yet.</a>";
+              else
+                statusHTML += "plan on getting this. - <a href=\"javascript:setItemCovered(" + item.id + ", true);\">Got it.</a> - <a href=\"javascript:setItemUncovered(" + item.id + ");\">I'm not going to get this.</a>";
+            }
+            else
+            {
+              statusHTML = "<strong>" + ServletHelper.escapeHTML(coveredByUser.firstName) + "</strong> ";
+              
+              if (item.fulfilled)
+                statusHTML += "got this.";
+              else
+                statusHTML += "plans on getting this.";
+            }
+            
+            if (item.fulfilled)
+              rowClass = isCoveredByCurrentUser? "item-user-covered-fulfilled" : "item-covered-fulfilled";
+            else
+              rowClass = isCoveredByCurrentUser? "item-user-covered-unfulfilled" : "item-covered-unfulfilled";
+          }
+        }
+        %>
+        <tr id="item<%=item.id%>" class="<%=rowClass%>">
+          <td><%=imageHTML%></td>
+          <td><%=nameHTML%></td>
+          <td><%=descriptionHTML%></td>
+          <td id="itemStatusCell<%=item.id%>"><%=statusHTML%></td>
+        </tr>
+        <%
+      }
+    }
+    %>
+  </tbody>
+</table>
 <t:footer />

@@ -13,14 +13,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.awesomebox.fwl.AuthManager;
-import net.awesomebox.fwl.FWLManagedHttpServlet;
+import net.awesomebox.fwl.FWLPageManagedHttpServlet;
 import net.awesomebox.fwl.SecurityUtil;
 import net.awesomebox.fwl.models.User;
 import net.awesomebox.servletmanager.ServletHelper;
 
 
 @WebServlet("/login")
-public class Login extends FWLManagedHttpServlet
+public class Login extends FWLPageManagedHttpServlet
 {
 	private static final long serialVersionUID = 1L;
     
@@ -84,7 +84,7 @@ public class Login extends FWLManagedHttpServlet
 		}
 		
 		Connection cn = getDatabaseConnection(request);
-		User user = User.getByLogin(cn, email, passwordHash);
+		User user = User.findByLogin(cn, email, passwordHash);
 		
 		// check if the email/password combo was invalid
 		if (user == null)

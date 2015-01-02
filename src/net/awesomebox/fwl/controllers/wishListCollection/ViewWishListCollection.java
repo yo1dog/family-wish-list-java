@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.awesomebox.fwl.AuthManager;
-import net.awesomebox.fwl.FWLManagedHttpServlet;
+import net.awesomebox.fwl.FWLPageManagedHttpServlet;
 import net.awesomebox.fwl.models.User;
 import net.awesomebox.fwl.models.WishList;
 import net.awesomebox.fwl.models.WishListCollection;
@@ -18,7 +18,7 @@ import net.awesomebox.servletmanager.ServletHelper;
 import net.awesomebox.servletmanager.exceptions.ResourceNotFoundException;
 
 @WebServlet("/collection")
-public class ViewWishListCollection extends FWLManagedHttpServlet
+public class ViewWishListCollection extends FWLPageManagedHttpServlet
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -30,7 +30,7 @@ public class ViewWishListCollection extends FWLManagedHttpServlet
 		int collectionID = ServletHelper.getRequiredParameterInt(request, "id");
 		
 		Connection cn = getDatabaseConnection(request);
-		WishListCollection collection = WishListCollection.getByID(cn, collectionID);
+		WishListCollection collection = WishListCollection.findByID(cn, collectionID);
 		
 		if (collection == null)
 			throw new ResourceNotFoundException("Unable to find collection with id \"" + collectionID + "\".");

@@ -1,4 +1,7 @@
+<%@page import="net.awesomebox.fwl.controllers.Home.UnfulfilledItemCollectionGroup"%>
+<%@page import="net.awesomebox.fwl.controllers.Home.UnfulfilledItemWishListGroup"%>
 <%@page import="java.sql.Connection"%>
+<%@page import="net.awesomebox.fwl.models.WishListItem"%>
 <%@page import="net.awesomebox.fwl.models.WishListCollection"%>
 <%@page import="net.awesomebox.fwl.models.User"%>
 <%@page import="net.awesomebox.servletmanager.ServletHelper"%>
@@ -8,31 +11,112 @@
 User loggedInUser = (User)request.getAttribute("loggedInUser");
 Connection cn = (Connection)request.getAttribute("cn");
 
-WishListCollection[] collections = loggedInUser.getCollections(cn);
+UnfulfilledItemCollectionGroup[] unfulfilledItemCollectionGroups = (UnfulfilledItemCollectionGroup[])request.getAttribute("unfulfilledItemCollectionGroups");
 %>
 
-<t:header />
+<t:header>
+  <jsp:attribute name="head">
+	  <script type="text/javascript" src="/js/ajax.js"></script>
+	  <script type="text/javascript" src="/js/script.js"></script>
+	  
+	  <script type="text/javascript">
+      function setItemCovered(itemID) {
+        setItemStatusHTML(itemID, "...");
+        
+        removeItemListItem(itemID);
+        ItemUpdater.setCovered(itemID, true, function(err) {
+          if (err) {
+            console.error(err);
+            
+            setItemStatusHTML(itemID, "Oops, something went wrong. Please try again latter.");
+            return;
+          }
+          
+          removeItemListItem(itemID);
+        });
+      }
+      
+      function setItemStatusHTML(itemID, html) {
+        var itemStatusSpan = document.getElementById("itemStatusSpan" + itemID);
+        itemStatusSpan.innerHTML = html;
+      }
+      
+      function removeItemListItem(itemID) {
+        // remove item
+        var itemLI = document.getElementById("itemListItem" + itemID);
+        var itemsUL = itemLI.parentNode;
+        
+        itemsUL.removeChild(itemLI);
+        
+        // remove wish list
+        if (itemsUL.getElementsByTagName("li").length > 0) return;
+        
+        var wishListLI = itemsUL.parentNode;
+        var wishListsUL = wishListLI.parentNode;
+        
+        wishListsUL.removeChild(wishListLI);
+        
+        // remove collection
+        if (wishListsUL.getElementsByTagName("li").length > 0) return;
+        
+        var collectionLI = wishListsUL.parentNode;
+        var collectionsUL = collectionLI.parentNode;
+        
+        collectionsUL.removeChild(collectionLI);
+      }
+      
+      function removeWishListListItem(wishListID) {
+        var wishListListItem = document.getElementById("wishListListItem" + wishListID);
+      }
+    </script>
+  </jsp:attribute>
+</t:header>
+
 <h2>Profile</h2>
 
-<a href="/collection/create">Create Collection</a>
+<h3>Gifts You Need to Get</h3>
+<p>These are items that you said you are going to get but you have not gotten yet. If you have gotten the item, click the <strong>I got it</strong> link to the right of the item.</p>
 
-<%
-if (collections.length == 0 )
-{
-	// show message if there are no wish list collections
-	%><p>You have no collections! Create one by clicking the <strong>Create Collection</strong> link above.<p><%
-}
-else
-{
-	// show the collections
-	%><ul><%
-	
-	for (int i = 0; i < collections.length; ++i)
+<ul>
+	<%
+	for (int i = 0; i < unfulfilledItemCollectionGroups.length; ++i)
 	{
-		%><li><a href="/collection?id=<%=collections[i].id%>"><%=ServletHelper.escapeHTML(collections[i].name)%></a></li><%
+		UnfulfilledItemCollectionGroup collectionGroup = unfulfilledItemCollectionGroups[i];
+		
+		%>
+		<li>
+		  <a href="/collection?id=<%=collectionGroup.collection.id%>"><%=ServletHelper.escapeHTML(collectionGroup.collection.name)%></a>
+		  
+		  <ul>
+			  <%
+			  for (UnfulfilledItemWishListGroup wishListGroup : collectionGroup.wishListGroups)
+			  {
+				  User user = wishListGroup.wishList.getOwner(cn);
+				  
+				  %>
+				  <li>
+				    <span><a href="/wishlist?id=<%=wishListGroup.wishList.id%>"><%=ServletHelper.escapeHTML(user.firstName)%></a></span>
+				    
+				    <ul>
+				      <%
+				      for (WishListItem item : wishListGroup.items)
+				      {
+				    	  %>
+				    	  <li id="itemListItem<%=item.id%>">
+				    	    <a href="/wishlist?id=<%=wishListGroup.wishList.id%>#item<%=item.id%>"><%=ServletHelper.escapeHTML(item.name)%></a>
+				    	    - <span id="itemStatusSpan<%=item.id%>"><a href="javascript:setItemCovered(<%=item.id%>);">Got it.</a></span>
+				    	  </li><%
+              }
+		          %>
+				    </ul>
+				  </li>
+				  <%
+			  }
+			  %>
+		  </ul>
+    </li>
+    <%
 	}
-	
-	%></ul><%
-}
-%>
+	%>
+</ul>
 <t:footer />

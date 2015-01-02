@@ -10,14 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.awesomebox.fwl.AuthManager;
-import net.awesomebox.fwl.FWLManagedHttpServlet;
+import net.awesomebox.fwl.FWLPageManagedHttpServlet;
 import net.awesomebox.fwl.models.User;
 import net.awesomebox.fwl.models.WishList;
 import net.awesomebox.fwl.models.WishListCollection;
 import net.awesomebox.servletmanager.ServletHelper;
 
 @WebServlet("/collection/create")
-public class CreateWishListCollection extends FWLManagedHttpServlet
+public class CreateWishListCollection extends FWLPageManagedHttpServlet
 {
 	private static final long serialVersionUID = 1L;
     

@@ -1,0 +1,576 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+DROP DATABASE fwl;
+--
+-- Name: fwl; Type: DATABASE; Schema: -; Owner: mike
+--
+
+CREATE DATABASE fwl WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+
+
+ALTER DATABASE fwl OWNER TO mike;
+
+\connect fwl
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: mike
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO mike;
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: mike
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE TABLE users (
+    id integer NOT NULL,
+    first_name text NOT NULL,
+    last_name text NOT NULL,
+    email text NOT NULL,
+    avatar_image_url text,
+    password_hash bytea NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO fwl_admin;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
+--
+
+CREATE SEQUENCE users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO fwl_admin;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
+--
+
+ALTER SEQUENCE users_id_seq OWNED BY users.id;
+
+
+--
+-- Name: wish_list_collections; Type: TABLE; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE TABLE wish_list_collections (
+    id integer NOT NULL,
+    owner_user_id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE public.wish_list_collections OWNER TO fwl_admin;
+
+--
+-- Name: wish_list_collections_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
+--
+
+CREATE SEQUENCE wish_list_collections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.wish_list_collections_id_seq OWNER TO fwl_admin;
+
+--
+-- Name: wish_list_collections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
+--
+
+ALTER SEQUENCE wish_list_collections_id_seq OWNED BY wish_list_collections.id;
+
+
+--
+-- Name: wish_list_items; Type: TABLE; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE TABLE wish_list_items (
+    id integer NOT NULL,
+    wish_list_id integer NOT NULL,
+    url text DEFAULT ''::text NOT NULL,
+    image_url text DEFAULT ''::text NOT NULL,
+    covered_by_user_id integer,
+    fulfilled boolean DEFAULT false NOT NULL,
+    priority integer NOT NULL,
+    name text NOT NULL,
+    description text DEFAULT ''::text NOT NULL,
+    creator_user_id integer NOT NULL
+);
+
+
+ALTER TABLE public.wish_list_items OWNER TO fwl_admin;
+
+--
+-- Name: wish_list_items_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
+--
+
+CREATE SEQUENCE wish_list_items_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.wish_list_items_id_seq OWNER TO fwl_admin;
+
+--
+-- Name: wish_list_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
+--
+
+ALTER SEQUENCE wish_list_items_id_seq OWNED BY wish_list_items.id;
+
+
+--
+-- Name: wish_list_items_priority_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
+--
+
+CREATE SEQUENCE wish_list_items_priority_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.wish_list_items_priority_seq OWNER TO fwl_admin;
+
+--
+-- Name: wish_list_items_priority_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
+--
+
+ALTER SEQUENCE wish_list_items_priority_seq OWNED BY wish_list_items.priority;
+
+
+--
+-- Name: wish_lists; Type: TABLE; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE TABLE wish_lists (
+    id integer NOT NULL,
+    wish_list_collection_id integer NOT NULL,
+    owner_user_id integer NOT NULL
+);
+
+
+ALTER TABLE public.wish_lists OWNER TO fwl_admin;
+
+--
+-- Name: wish_lists_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
+--
+
+CREATE SEQUENCE wish_lists_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.wish_lists_id_seq OWNER TO fwl_admin;
+
+--
+-- Name: wish_lists_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
+--
+
+ALTER SEQUENCE wish_lists_id_seq OWNED BY wish_lists.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_list_collections ALTER COLUMN id SET DEFAULT nextval('wish_list_collections_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_list_items ALTER COLUMN id SET DEFAULT nextval('wish_list_items_id_seq'::regclass);
+
+
+--
+-- Name: priority; Type: DEFAULT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_list_items ALTER COLUMN priority SET DEFAULT nextval('wish_list_items_priority_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_lists ALTER COLUMN id SET DEFAULT nextval('wish_lists_id_seq'::regclass);
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: fwl_admin
+--
+
+COPY users (id, first_name, last_name, email, avatar_image_url, password_hash) FROM stdin;
+3	Taylor	Moore	taylorkmoore@hotmail.com	\N	\\x97032b0a2c60d1150d75bd236b046ed26fb37329683931c8b8ae6fd486556a4a
+2	Mike	Moore	michael_eric_moore@hotmail.com	\N	\\x0a1cd2ac7e91558f5c93770bd0b6ac8016cd23bd3d4f222f04c7cef0333eb58d
+4	Dad		dad@dad.com	\N	\\x590f2bf527c5896f9179e087b2282865348833557d6868f0e81562a62eb9608b
+\.
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
+--
+
+SELECT pg_catalog.setval('users_id_seq', 4, true);
+
+
+--
+-- Data for Name: wish_list_collections; Type: TABLE DATA; Schema: public; Owner: fwl_admin
+--
+
+COPY wish_list_collections (id, owner_user_id, name) FROM stdin;
+1	2	Christmas 2014
+4	2	test3
+6	2	test4
+\.
+
+
+--
+-- Name: wish_list_collections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
+--
+
+SELECT pg_catalog.setval('wish_list_collections_id_seq', 6, true);
+
+
+--
+-- Data for Name: wish_list_items; Type: TABLE DATA; Schema: public; Owner: fwl_admin
+--
+
+COPY wish_list_items (id, wish_list_id, url, image_url, covered_by_user_id, fulfilled, priority, name, description, creator_user_id) FROM stdin;
+9	3			\N	f	9	item for taylor		2
+10	3			\N	f	10	item 1		3
+11	3			\N	f	11	item 2		3
+12	3			\N	f	12	item 3		3
+\.
+
+
+--
+-- Name: wish_list_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
+--
+
+SELECT pg_catalog.setval('wish_list_items_id_seq', 12, true);
+
+
+--
+-- Name: wish_list_items_priority_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
+--
+
+SELECT pg_catalog.setval('wish_list_items_priority_seq', 12, true);
+
+
+--
+-- Data for Name: wish_lists; Type: TABLE DATA; Schema: public; Owner: fwl_admin
+--
+
+COPY wish_lists (id, wish_list_collection_id, owner_user_id) FROM stdin;
+2	1	2
+3	1	3
+4	4	2
+5	6	2
+6	1	4
+\.
+
+
+--
+-- Name: wish_lists_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
+--
+
+SELECT pg_catalog.setval('wish_lists_id_seq', 6, true);
+
+
+--
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: wish_list_collections_pkey; Type: CONSTRAINT; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+ALTER TABLE ONLY wish_list_collections
+    ADD CONSTRAINT wish_list_collections_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: wish_list_items_pkey; Type: CONSTRAINT; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+ALTER TABLE ONLY wish_list_items
+    ADD CONSTRAINT wish_list_items_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: wish_lists_pkey; Type: CONSTRAINT; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+ALTER TABLE ONLY wish_lists
+    ADD CONSTRAINT wish_lists_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_email_idx; Type: INDEX; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE INDEX users_email_idx ON users USING btree (email);
+
+
+--
+-- Name: wish_list_collections_owner_user_id_idx; Type: INDEX; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE INDEX wish_list_collections_owner_user_id_idx ON wish_list_collections USING btree (owner_user_id);
+
+
+--
+-- Name: wish_list_items_covered_by_user_id_idx; Type: INDEX; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE INDEX wish_list_items_covered_by_user_id_idx ON wish_list_items USING btree (covered_by_user_id);
+
+
+--
+-- Name: wish_list_items_priority_idx; Type: INDEX; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE INDEX wish_list_items_priority_idx ON wish_list_items USING btree (priority);
+
+
+--
+-- Name: wish_list_items_wish_list_id_idx; Type: INDEX; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE INDEX wish_list_items_wish_list_id_idx ON wish_list_items USING btree (wish_list_id);
+
+
+--
+-- Name: wish_lists_wish_list_collection_id_owner_user_id_idx; Type: INDEX; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE INDEX wish_lists_wish_list_collection_id_owner_user_id_idx ON wish_lists USING btree (wish_list_collection_id, owner_user_id);
+
+
+--
+-- Name: wish_list_collections_owner_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_list_collections
+    ADD CONSTRAINT wish_list_collections_owner_user_id_fkey FOREIGN KEY (owner_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wish_list_items_covered_by_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_list_items
+    ADD CONSTRAINT wish_list_items_covered_by_user_id_fkey FOREIGN KEY (covered_by_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: wish_list_items_creator_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_list_items
+    ADD CONSTRAINT wish_list_items_creator_user_id_fkey FOREIGN KEY (creator_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wish_list_items_wish_list_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_list_items
+    ADD CONSTRAINT wish_list_items_wish_list_id_fkey FOREIGN KEY (wish_list_id) REFERENCES wish_lists(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wish_lists_owner_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_lists
+    ADD CONSTRAINT wish_lists_owner_user_id_fkey FOREIGN KEY (owner_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: wish_lists_wish_list_collection_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY wish_lists
+    ADD CONSTRAINT wish_lists_wish_list_collection_id_fkey FOREIGN KEY (wish_list_collection_id) REFERENCES wish_list_collections(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: mike
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM mike;
+GRANT ALL ON SCHEMA public TO mike;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- Name: users; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON TABLE users FROM PUBLIC;
+REVOKE ALL ON TABLE users FROM fwl_admin;
+GRANT ALL ON TABLE users TO fwl_admin;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO fwl_user;
+
+
+--
+-- Name: users_id_seq; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON SEQUENCE users_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE users_id_seq FROM fwl_admin;
+GRANT ALL ON SEQUENCE users_id_seq TO fwl_admin;
+GRANT USAGE ON SEQUENCE users_id_seq TO fwl_user;
+
+
+--
+-- Name: wish_list_collections; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON TABLE wish_list_collections FROM PUBLIC;
+REVOKE ALL ON TABLE wish_list_collections FROM fwl_admin;
+GRANT ALL ON TABLE wish_list_collections TO fwl_admin;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE wish_list_collections TO fwl_user;
+
+
+--
+-- Name: wish_list_collections_id_seq; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON SEQUENCE wish_list_collections_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE wish_list_collections_id_seq FROM fwl_admin;
+GRANT ALL ON SEQUENCE wish_list_collections_id_seq TO fwl_admin;
+GRANT USAGE ON SEQUENCE wish_list_collections_id_seq TO fwl_user;
+
+
+--
+-- Name: wish_list_items; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON TABLE wish_list_items FROM PUBLIC;
+REVOKE ALL ON TABLE wish_list_items FROM fwl_admin;
+GRANT ALL ON TABLE wish_list_items TO fwl_admin;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE wish_list_items TO fwl_user;
+
+
+--
+-- Name: wish_list_items_id_seq; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON SEQUENCE wish_list_items_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE wish_list_items_id_seq FROM fwl_admin;
+GRANT ALL ON SEQUENCE wish_list_items_id_seq TO fwl_admin;
+GRANT USAGE ON SEQUENCE wish_list_items_id_seq TO fwl_user;
+
+
+--
+-- Name: wish_list_items_priority_seq; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON SEQUENCE wish_list_items_priority_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE wish_list_items_priority_seq FROM fwl_admin;
+GRANT ALL ON SEQUENCE wish_list_items_priority_seq TO fwl_admin;
+GRANT USAGE ON SEQUENCE wish_list_items_priority_seq TO fwl_user;
+
+
+--
+-- Name: wish_lists; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON TABLE wish_lists FROM PUBLIC;
+REVOKE ALL ON TABLE wish_lists FROM fwl_admin;
+GRANT ALL ON TABLE wish_lists TO fwl_admin;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE wish_lists TO fwl_user;
+
+
+--
+-- Name: wish_lists_id_seq; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON SEQUENCE wish_lists_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE wish_lists_id_seq FROM fwl_admin;
+GRANT ALL ON SEQUENCE wish_lists_id_seq TO fwl_admin;
+GRANT USAGE ON SEQUENCE wish_lists_id_seq TO fwl_user;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

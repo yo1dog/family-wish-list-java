@@ -47,15 +47,14 @@ public class User
 	
 	public final WishListCollection[] getCollections(Connection cn) throws SQLException {
 		if (collections == null) {
-			collections = WishListCollection.getListByMember(cn, id);
+			collections = WishListCollection.findListByMember(cn, id);
 		}
 		
 		return collections;
 	}
 	
 	
-	
-	public static User getByID(Connection cn, int userID) throws SQLException
+	public static User findByID(Connection cn, int userID) throws SQLException
 	{
 		PreparedStatement st = cn.prepareStatement("SELECT * FROM users WHERE id = ?");
 		st.setInt(1, userID);
@@ -72,7 +71,7 @@ public class User
 		return user;
 	}
 	
-	public static User getByLogin(Connection cn, String email, byte[] passwordHash) throws SQLException
+	public static User findByLogin(Connection cn, String email, byte[] passwordHash) throws SQLException
 	{
 		PreparedStatement st = cn.prepareStatement("SELECT * FROM users WHERE email = ? AND password_hash = ?");
 		st.setString(1, email);
@@ -142,5 +141,24 @@ public class User
 			
 			throw e;
 		}
+	}
+	
+	
+	public static boolean lookupIsMemeberOfCollection(Connection cn, int userID, int collectionID) throws SQLException
+	{
+		PreparedStatement st = cn.prepareStatement(
+			"SELECT 1 " +
+			"FROM wish_lists " + 
+			"WHERE owner_user_id = ? AND wish_list_collection_id = ?");
+		st.setInt(1, userID);
+		st.setInt(2, collectionID);
+		
+		ResultSet rs = st.executeQuery();
+		boolean exists = rs.next();
+		
+		rs.close();
+		st.close();
+		
+		return exists;
 	}
 }
