@@ -6,28 +6,49 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%
-Connection cn = (Connection)request.getAttribute("cn");
-WishListCollection collection = (WishListCollection)request.getAttribute("collection");
-Integer loggedInUserWishListIndex = (Integer)request.getAttribute("loggedInUserWishListIndex");
+Connection         cn                   = (Connection)        request.getAttribute("cn");
+WishListCollection collection           = (WishListCollection)request.getAttribute("collection");
+WishList           loggedInUserWishList = (WishList)          request.getAttribute("loggedInUserWishList");
+User               loggedInUser         = (User)              request.getAttribute("loggedInUser");
 
 WishList[] wishLists = collection.getWishLists(cn);
+
+// check if the logged in user is the owner of the list
+boolean loggedInUserIsOwner = collection.ownerUserID == loggedInUser.id;
 %>
 
 <t:header />
 <h2><%=ServletHelper.escapeHTML(collection.name)%></h2>
 
+
 <%
 // show the logged-in user's wish list
-if (loggedInUserWishListIndex != null)
+if (loggedInUserWishList != null)
 {
-	%><a href="/wishlist?id=<%=wishLists[loggedInUserWishListIndex].id%>">Your List</a><%
+	%><a href="/wishlist?id=<%=loggedInUserWishList.id%>">Your Wish List</a><%
+}
+else
+{
+	%><a href="/wishlist/create">Create Your Wish List</a><%
 }
 
 // show message if there are no other wish lists
-if (wishLists.length == 0 || (wishLists.length == 1 && loggedInUserWishListIndex != null))
+if (wishLists.length == 0 || (wishLists.length == 1 && loggedInUserWishList != null))
 {
-	%><p>There is no one else in this collection! Add people by clicking the <strong>Invite</strong> button above.<p><%
+	%><p>There is no one else in this collection! <%
+	
+	if (loggedInUserIsOwner)
+	{
+	  %>Add people by clicking the <strong>Invite</strong> button above.<%
+	}
+	else
+	{
+		%>Tell the collection owner to invite people.<%
+	}
+	
+	%></p><%
 }
+
 // show the wish lists
 else
 {
@@ -35,7 +56,7 @@ else
 	
 	for (int i = 0; i < wishLists.length; ++i)
 	{
-		if (i == loggedInUserWishListIndex)
+		if (wishLists[i] == loggedInUserWishList)
 			continue;
 		
 		WishList wishList = wishLists[i];

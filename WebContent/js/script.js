@@ -2,9 +2,6 @@ var ItemUpdater = {
   setCovered: function(itemID, fulfilled, cb) {
     var unset = fulfilled == null || typeof fulfilled === "undefined";
     
-    setItemStatusHTML(itemID, "...");
-    
-    
     var params = "itemID=" + itemID;
     if (!unset)
       params += "&fulfilled=" + (fulfilled? "true" : "false");

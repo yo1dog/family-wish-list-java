@@ -14,8 +14,36 @@ WishList           wishList      = (WishList)request.getAttribute("wishList");
 WishListCollection collection    = wishList.getCollection(cn);
 User               wishListOwner = wishList.getOwner(cn);
 
-WishListItem[] itemsByWishListOwner = (WishListItem[])request.getAttribute("itemsByWishListOwner");
-WishListItem[] itemsByOthers        = (WishListItem[])request.getAttribute("itemsByOthers");
+// separate items
+WishListItem[] items = wishList.getItems(cn);
+
+// count number of items by the owner
+int numItemsByWishListOwner = 0;
+for (int i = 0; i < items.length; ++i)
+{
+  if (items[i].creatorUserID == wishList.ownerUserID)
+    ++numItemsByWishListOwner;
+}
+
+WishListItem[] itemsByWishListOwner = new WishListItem[numItemsByWishListOwner];
+WishListItem[] itemsByOthers        = new WishListItem[items.length - numItemsByWishListOwner];
+
+int itemsByWishListOwnerIndex = 0;
+int itemsByOthersIndex = 0;
+
+for (int i = 0; i < items.length; ++i)
+{
+  if (items[i].creatorUserID == wishList.ownerUserID)
+  {
+    itemsByWishListOwner[itemsByWishListOwnerIndex] = items[i];
+    ++itemsByWishListOwnerIndex;
+  }
+  else
+  {
+    itemsByOthers[itemsByOthersIndex] = items[i];
+    ++itemsByOthersIndex;
+  }
+}
 
 boolean isLoggedInUsersWishList = wishListOwner.id == loggedInUser.id;
 
@@ -75,7 +103,7 @@ else
           }
           
           
-          var statusHTML = "No one is getting this. <a href=\"javascript:setItemCovered(" + itemID + ", false);\">I'll get this.</a> - <a href=\"javascript:setItemCovered(" + itemID + ", true);\">I already got this.</a>";
+          var statusHTML = "No one is getting this. <a href=\"javascript:setItemCovered(" + itemID + ", false);\">I'll get this.</a>";
           setItemStatusHTML(itemID, statusHTML);
           setItemRowClass(itemID, "");
         });
@@ -112,15 +140,15 @@ else
     for (int r = 0; r < 2; ++r)
     {
       boolean firstPass = r == 0;
-      WishListItem[] items;
+      WishListItem[] currentItems;
       
       if (firstPass)
       {
         // show items from the wish list owner first
-        items = itemsByWishListOwner;
+        currentItems = itemsByWishListOwner;
         
         // show message if there are none
-        if (items.length == 0)
+        if (currentItems.length == 0)
         {
         	String messageHTML;
         	
@@ -145,10 +173,10 @@ else
         if (isLoggedInUsersWishList)
         	continue;
         
-        items = itemsByOthers;
+        currentItems = itemsByOthers;
         
         // skip if there are none
-        if (items.length == 0)
+        if (currentItems.length == 0)
           continue;
         
         %>
@@ -158,9 +186,9 @@ else
         <%
       }
       
-      for (int i = 0; i < items.length; ++i)
+      for (int i = 0; i < currentItems.length; ++i)
       {
-        WishListItem item = items[i];
+        WishListItem item = currentItems[i];
         
         String urlEscaped = null;
         if (item.url != null)
@@ -187,7 +215,7 @@ else
           descriptionHTML = ServletHelper.newlinesToBR(ServletHelper.escapeHTML(item.description));
         
         // status
-        String rowClass = "";
+        String rowClass = "item";
         String statusHTML = "";
         
         // dont show if it is the logged-in user's wishlist
@@ -196,7 +224,7 @@ else
           User coveredByUser = item.getCoveredByUser(cn);
           
           if (coveredByUser == null)
-            statusHTML = "No one is getting this. <a href=\"javascript:setItemCovered(" + item.id + ", false);\">I'll get this.</a> - <a href=\"javascript:setItemCovered(" + item.id + ", true);\">I already got this.</a>";
+            statusHTML = "No one is getting this. <a href=\"javascript:setItemCovered(" + item.id + ", false);\">I'll get this.</a>";
           else
           {
             boolean isCoveredByCurrentUser = coveredByUser.id == loggedInUser.id;
@@ -221,9 +249,9 @@ else
             }
             
             if (item.fulfilled)
-              rowClass = isCoveredByCurrentUser? "item-user-covered-fulfilled" : "item-covered-fulfilled";
+              rowClass += " " + (isCoveredByCurrentUser? "item-user-covered-fulfilled" : "item-covered-fulfilled");
             else
-              rowClass = isCoveredByCurrentUser? "item-user-covered-unfulfilled" : "item-covered-unfulfilled";
+              rowClass += " " + (isCoveredByCurrentUser? "item-user-covered-unfulfilled" : "item-covered-unfulfilled");
           }
         }
         %>

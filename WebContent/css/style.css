@@ -20,6 +20,13 @@ a
 	padding: 10px;
 }
 
+
+.item img
+{
+  max-width: 64px;
+  max-height: 64px;
+}
+
 .item-covered-fulfilled
 {
 	background-color: #CCCCCC;

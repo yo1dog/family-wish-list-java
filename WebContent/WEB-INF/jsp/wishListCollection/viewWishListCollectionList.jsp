@@ -14,8 +14,6 @@ WishListCollection[] collections = loggedInUser.getCollections(cn);
 <t:header />
 <h2>Collections</h2>
 
-<a href="/collection/create">Create Collection</a>
-
 <%
 if (collections.length == 0 )
 {

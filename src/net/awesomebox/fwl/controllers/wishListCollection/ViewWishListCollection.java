@@ -35,21 +35,37 @@ public class ViewWishListCollection extends FWLPageManagedHttpServlet
 		if (collection == null)
 			throw new ResourceNotFoundException("Unable to find collection with id \"" + collectionID + "\".");
 		
+		
+		// check if this is an exclusive list
+		if (collection.exclusiveWishListID != null) {
+			// show the list
+			WishList wishList = WishList.findByID(cn, collection.exclusiveWishListID);
+			
+			if (wishList == null)
+				throw new ResourceNotFoundException("Unable to find wish list with id \"" + collection.exclusiveWishListID + "\".");
+			
+			request.setAttribute("cn"      , cn);
+			request.setAttribute("wishList", wishList);
+			request.getRequestDispatcher("/WEB-INF/jsp/wishList/viewWishList.jsp").forward(request, response);
+			return;
+		}
+		
+		// show the collection
 		WishList[] wishLists = collection.getWishLists(cn);
 		
-		Integer loggedInUserWishListIndex = null;
+		WishList loggedInUserWishList = null;
 		for (int i = 0; i < wishLists.length; ++i)
 		{
 			if (wishLists[i].ownerUserID == loggedInUser.id)
 			{
-				loggedInUserWishListIndex = i;
+				loggedInUserWishList = wishLists[i];
 				break;
 			}
 		}
 		
 		request.setAttribute("cn", cn);
 		request.setAttribute("collection", collection);
-		request.setAttribute("loggedInUserWishListIndex", loggedInUserWishListIndex);
+		request.setAttribute("loggedInUserWishList", loggedInUserWishList);
 		
 		request.getRequestDispatcher("/WEB-INF/jsp/wishListCollection/viewWishListCollection.jsp").forward(request, response);
 	}

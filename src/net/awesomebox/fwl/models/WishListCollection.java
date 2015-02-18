@@ -6,32 +6,38 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.awesomebox.fwl.database.Database;
+
 public class WishListCollection
 {
-	public final int    id;
-	public final int    ownerUserId;
-	public final String name;
+	public final int     id;
+	public final int     ownerUserID;
+	public final String  name;
+	public final Integer exclusiveWishListID;
 	
 	private WishList[] wishLists;
 	
 	
 	private WishListCollection(
-		int    id,
-		int    ownerUserId,
-		String name
+		int     id,
+		int     ownerUserID,
+		String  name,
+		Integer exclusiveWishListID
 	)
 	{
-		this.id          = id;
-		this.ownerUserId = ownerUserId;
-		this.name        = name;
+		this.id                  = id;
+		this.ownerUserID         = ownerUserID;
+		this.name                = name;
+		this.exclusiveWishListID = exclusiveWishListID;
 	}
 	
 	private WishListCollection(ResultSet rs) throws SQLException
 	{
 		this(
-			rs.getInt   ("id"),
-			rs.getInt   ("owner_user_id"),
-			rs.getString("name")
+			rs.getInt   (       "id"),
+			rs.getInt   (       "owner_user_id"),
+			rs.getString(       "name"),
+			Database.gnvInt(rs, "exclusive_wish_list_id")
 		);
 	}
 	
@@ -85,13 +91,7 @@ public class WishListCollection
 	{
 		ArrayList<WishListCollection> collections = new ArrayList<WishListCollection>();
 		
-		PreparedStatement st = cn.prepareStatement(
-			"SELECT wish_list_collections.* " +
-			"FROM wish_lists " +
-			"LEFT JOIN wish_list_collections ON (wish_lists.wish_list_collection_id = wish_list_collections.id) " +
-			"WHERE wish_lists.owner_user_id = ?");
-		st.setInt(1, userID);
-		
+		PreparedStatement st = cn.prepareStatement("SELECT * FROM wish_list_collections ORDER BY id DESC");
 		ResultSet rs = st.executeQuery();
 		
 		while(rs.next())

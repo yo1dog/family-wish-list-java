@@ -23,7 +23,6 @@ UnfulfilledItemCollectionGroup[] unfulfilledItemCollectionGroups = (UnfulfilledI
       function setItemCovered(itemID) {
         setItemStatusHTML(itemID, "...");
         
-        removeItemListItem(itemID);
         ItemUpdater.setCovered(itemID, true, function(err) {
           if (err) {
             console.error(err);
