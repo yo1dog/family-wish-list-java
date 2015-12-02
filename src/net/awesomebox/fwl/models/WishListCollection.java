@@ -58,10 +58,7 @@ public class WishListCollection
 		st.setInt(1, collectionID);
 		ResultSet rs = st.executeQuery();
 		
-		if (rs.next() == false)
-			return null;
-		
-		WishListCollection collection = new WishListCollection(rs);
+		WishListCollection collection = rs.next()? new WishListCollection(rs) : null;
 		
 		rs.close();
 		st.close();

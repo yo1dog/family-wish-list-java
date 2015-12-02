@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 
-<Context antiJARLocking="true" path="/fwl" allowLinking="true" aliases="/data=/etc/fwl">
+<Context antiJARLocking="true" path="/fwl" allowLinking="true" aliases="/data=/etc/fwl" sessionCookiePath="/">
 
 	<Resource name="jdbc/postgres" auth="Container"
 		type="javax.sql.DataSource"

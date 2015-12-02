@@ -70,10 +70,7 @@ public class WishList
 		st.setInt(1, wishListID);
 		ResultSet rs = st.executeQuery();
 		
-		if (rs.next() == false)
-			return null;
-		
-		WishList wishList = new WishList(rs);
+		WishList wishList = rs.next()? new WishList(rs) : null;
 		
 		rs.close();
 		st.close();
@@ -97,6 +94,25 @@ public class WishList
 		st.close();
 		
 		return wishLists.toArray(new WishList[wishLists.size()]);
+	}
+	
+	public static final WishList findByOwnerAndCollection(Connection cn, int ownerID, int collectionID) throws SQLException
+	{
+		PreparedStatement st = cn.prepareStatement("SELECT * FROM wish_lists WHERE owner_id = ? AND collection_id = ?");
+		st.setInt(1, ownerID);
+		st.setInt(2, collectionID);
+		
+		ResultSet rs = st.executeQuery();
+		
+		if (rs.next() == false)
+			return null;
+		
+		WishList wishList = new WishList(rs);
+		
+		rs.close();
+		st.close();
+		
+		return wishList;
 	}
 	
 	

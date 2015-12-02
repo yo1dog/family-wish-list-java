@@ -29,7 +29,12 @@ if (loggedInUserWishList != null)
 }
 else
 {
-	%><a href="/wishlist/create">Create Your Wish List</a><%
+	%>
+	<form name="createCollectionForm" method="post" action="/wishlist/create">
+		<input type="hidden" name="collectionID" value="<%=collection.id%>" />
+		<input type="submit" value="Create Your Wish List" />
+	</form>
+	<%
 }
 
 // show message if there are no other wish lists

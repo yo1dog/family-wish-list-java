@@ -60,10 +60,7 @@ public class User
 		st.setInt(1, userID);
 		ResultSet rs = st.executeQuery();
 		
-		if (rs.next() == false)
-			return null;
-		
-		User user = new User(rs);
+		User user = rs.next()? new User(rs) : null;
 		
 		rs.close();
 		st.close();
@@ -79,10 +76,7 @@ public class User
 		
 		ResultSet rs = st.executeQuery();
 		
-		if (rs.next() == false)
-			return null;
-		
-		User user = new User(rs);
+		User user = rs.next()? new User(rs) : null;
 		
 		rs.close();
 		st.close();
@@ -146,6 +140,8 @@ public class User
 	
 	public static boolean lookupIsMemeberOfCollection(Connection cn, int userID, int collectionID) throws SQLException
 	{
+	    return true;
+	    /*
 		PreparedStatement st = cn.prepareStatement(
 			"SELECT 1 " +
 			"FROM wish_lists " + 
@@ -160,5 +156,6 @@ public class User
 		st.close();
 		
 		return exists;
+		*/
 	}
 }
