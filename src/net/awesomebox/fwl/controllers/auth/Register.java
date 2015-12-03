@@ -53,10 +53,11 @@ public class Register extends FWLPageManagedHttpServlet
 		
 		
 		// get form data
-		String firstName = ServletHelper.getParameterNotEmpty(request, "firstName");
-		String lastName  = ServletHelper.getParameter        (request, "lastName", "");
-		String email     = ServletHelper.getParameterNotEmpty(request, "email");
-		String password  = ServletHelper.getParameterNotEmpty(request, "password");
+		String firstName       = ServletHelper.getParameterNotEmpty(request, "firstName");
+		String lastName        = ServletHelper.getParameter        (request, "lastName", "");
+		String email           = ServletHelper.getParameterNotEmpty(request, "email");
+		String password        = ServletHelper.getParameterNotEmpty(request, "password");
+		String passwordConfirm = ServletHelper.getParameterNotEmpty(request, "passwordConfirm");
 		
 		Map<String, String> formData = new HashMap<String, String>();
 		formData.put("firstName", firstName);
@@ -81,6 +82,11 @@ public class Register extends FWLPageManagedHttpServlet
 		if (password == null)
 		{
 			returnFormErrorMessage("Please enter a password.", formData, request, response);
+			return;
+		}
+		if (passwordConfirm == null || !passwordConfirm.equals(password))
+		{
+			returnFormErrorMessage("Passwords must match.", formData, request, response);
 			return;
 		}
 		

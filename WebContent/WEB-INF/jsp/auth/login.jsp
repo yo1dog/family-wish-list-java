@@ -22,6 +22,8 @@ String emailEscaped = email != null? ServletHelper.escapeHTML(email) : "";
 	</table>
 	
 	<input type="submit" value="Login" /><br />
-	<span id="formErrorMessage">${formErrorMessage}</span>
+	<span id="formErrorMessage">${formErrorMessage}</span><br />
+	<br />
+	<a href="/register">Register</a>
 </form>
 <t:footer />

@@ -47,6 +47,10 @@ if (formData != null)
 			<td><label for="password">Password:</label></td>
 			<td><input type="password" name="password" required="required" /></td>
 		</tr>
+		<tr>
+			<td><label for="password">Password Again:</label></td>
+			<td><input type="password" name="passwordConfirm" required="required" /></td>
+		</tr>
 	</table>
 	
 	<input type="submit" value="Register" /><br />
