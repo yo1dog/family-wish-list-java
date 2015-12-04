@@ -11,7 +11,7 @@ if (queryString != null)
 %>
 			
 			<hr style="margin: 20px 0px 20px 0px;" />
-			<a href="/suggestion/create?referringPage=<%=URLEncoder.encode(referringPage, "UTF-8")%>" target="_blank">Make Suggestion</a>
+			<small><a href="/suggestion/create?referringPage=<%=URLEncoder.encode(referringPage, "UTF-8")%>" target="_blank">Make Site Suggestion</a></small>
 			
 		</main>
 	</body>
