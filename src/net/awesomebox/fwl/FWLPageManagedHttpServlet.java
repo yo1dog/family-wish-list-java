@@ -20,6 +20,8 @@ public class FWLPageManagedHttpServlet extends FWLManagedHttpServlet
 		if (e instanceof UnauthorizedException)
 		{
 			String path = request.getRequestURI();
+			path = path.replace(request.getContextPath(), "");
+			
 			String queryString = request.getQueryString();
 			
 			String callbackURL = path;

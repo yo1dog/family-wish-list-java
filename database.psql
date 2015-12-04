@@ -65,6 +65,42 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: suggestions; Type: TABLE; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+CREATE TABLE suggestions (
+    id integer NOT NULL,
+    author_user_id integer,
+    text text NOT NULL,
+    created_timestamp timestamp without time zone DEFAULT now() NOT NULL,
+    referring_page text
+);
+
+
+ALTER TABLE suggestions OWNER TO fwl_admin;
+
+--
+-- Name: suggestions_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
+--
+
+CREATE SEQUENCE suggestions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE suggestions_id_seq OWNER TO fwl_admin;
+
+--
+-- Name: suggestions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
+--
+
+ALTER SEQUENCE suggestions_id_seq OWNED BY suggestions.id;
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: fwl_admin; Tablespace: 
 --
 
@@ -78,7 +114,7 @@ CREATE TABLE users (
 );
 
 
-ALTER TABLE public.users OWNER TO fwl_admin;
+ALTER TABLE users OWNER TO fwl_admin;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
@@ -92,7 +128,7 @@ CREATE SEQUENCE users_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.users_id_seq OWNER TO fwl_admin;
+ALTER TABLE users_id_seq OWNER TO fwl_admin;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
@@ -113,7 +149,7 @@ CREATE TABLE wish_list_collections (
 );
 
 
-ALTER TABLE public.wish_list_collections OWNER TO fwl_admin;
+ALTER TABLE wish_list_collections OWNER TO fwl_admin;
 
 --
 -- Name: wish_list_collections_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
@@ -127,7 +163,7 @@ CREATE SEQUENCE wish_list_collections_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.wish_list_collections_id_seq OWNER TO fwl_admin;
+ALTER TABLE wish_list_collections_id_seq OWNER TO fwl_admin;
 
 --
 -- Name: wish_list_collections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
@@ -154,7 +190,7 @@ CREATE TABLE wish_list_items (
 );
 
 
-ALTER TABLE public.wish_list_items OWNER TO fwl_admin;
+ALTER TABLE wish_list_items OWNER TO fwl_admin;
 
 --
 -- Name: wish_list_items_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
@@ -168,7 +204,7 @@ CREATE SEQUENCE wish_list_items_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.wish_list_items_id_seq OWNER TO fwl_admin;
+ALTER TABLE wish_list_items_id_seq OWNER TO fwl_admin;
 
 --
 -- Name: wish_list_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
@@ -189,7 +225,7 @@ CREATE SEQUENCE wish_list_items_priority_seq
     CACHE 1;
 
 
-ALTER TABLE public.wish_list_items_priority_seq OWNER TO fwl_admin;
+ALTER TABLE wish_list_items_priority_seq OWNER TO fwl_admin;
 
 --
 -- Name: wish_list_items_priority_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
@@ -209,7 +245,7 @@ CREATE TABLE wish_lists (
 );
 
 
-ALTER TABLE public.wish_lists OWNER TO fwl_admin;
+ALTER TABLE wish_lists OWNER TO fwl_admin;
 
 --
 -- Name: wish_lists_id_seq; Type: SEQUENCE; Schema: public; Owner: fwl_admin
@@ -223,13 +259,20 @@ CREATE SEQUENCE wish_lists_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.wish_lists_id_seq OWNER TO fwl_admin;
+ALTER TABLE wish_lists_id_seq OWNER TO fwl_admin;
 
 --
 -- Name: wish_lists_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: fwl_admin
 --
 
 ALTER SEQUENCE wish_lists_id_seq OWNED BY wish_lists.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY suggestions ALTER COLUMN id SET DEFAULT nextval('suggestions_id_seq'::regclass);
 
 
 --
@@ -268,6 +311,26 @@ ALTER TABLE ONLY wish_lists ALTER COLUMN id SET DEFAULT nextval('wish_lists_id_s
 
 
 --
+-- Data for Name: suggestions; Type: TABLE DATA; Schema: public; Owner: fwl_admin
+--
+
+COPY suggestions (id, author_user_id, text, created_timestamp, referring_page) FROM stdin;
+1	6	Test sug.\r\n\r\nMay	2015-12-03 17:41:49.497278	\N
+2	6	Another one!	2015-12-03 17:41:49.497278	\N
+3	6	Here you go.	2015-12-03 17:42:53.129586	\N
+4	6	One more.	2015-12-03 17:44:09.858063	\N
+5	6	Test again.	2015-12-03 17:46:05.445949	\N
+\.
+
+
+--
+-- Name: suggestions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
+--
+
+SELECT pg_catalog.setval('suggestions_id_seq', 5, true);
+
+
+--
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: fwl_admin
 --
 
@@ -275,6 +338,8 @@ COPY users (id, first_name, last_name, email, avatar_image_url, password_hash) F
 3	Taylor	Moore	taylorkmoore@hotmail.com	\N	\\x97032b0a2c60d1150d75bd236b046ed26fb37329683931c8b8ae6fd486556a4a
 2	Mike	Moore	michael_eric_moore@hotmail.com	\N	\\x0a1cd2ac7e91558f5c93770bd0b6ac8016cd23bd3d4f222f04c7cef0333eb58d
 4	Dad		dad@dad.com	\N	\\x590f2bf527c5896f9179e087b2282865348833557d6868f0e81562a62eb9608b
+5	test	test	test	\N	\\x468d9079d24f193d41ab725a3449804af3991df198a8057129c3346da3c57277
+6	Mike	Moore	michael_eric_moore@hotmail.com	\N	\\xd22a1693228bbce71b2b4be24c311a9ea64107a043d9c43cc84f44fb7d342904
 \.
 
 
@@ -282,7 +347,7 @@ COPY users (id, first_name, last_name, email, avatar_image_url, password_hash) F
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
 --
 
-SELECT pg_catalog.setval('users_id_seq', 4, true);
+SELECT pg_catalog.setval('users_id_seq', 6, true);
 
 
 --
@@ -294,6 +359,7 @@ COPY wish_list_collections (id, owner_user_id, name, exclusive_wish_list_id) FRO
 4	2	test3	\N
 6	2	test4	\N
 7	2	Taylor's Birthday	8
+8	2	Test	\N
 \.
 
 
@@ -301,7 +367,7 @@ COPY wish_list_collections (id, owner_user_id, name, exclusive_wish_list_id) FRO
 -- Name: wish_list_collections_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
 --
 
-SELECT pg_catalog.setval('wish_list_collections_id_seq', 7, true);
+SELECT pg_catalog.setval('wish_list_collections_id_seq', 8, true);
 
 
 --
@@ -311,9 +377,10 @@ SELECT pg_catalog.setval('wish_list_collections_id_seq', 7, true);
 COPY wish_list_items (id, wish_list_id, url, image_url, covered_by_user_id, fulfilled, priority, name, description, creator_user_id) FROM stdin;
 13	2	http://www.newegg.com/Product/Product.aspx?Item=N82E16814487038	http://images17.newegg.com/is/image/newegg/14-487-038-Z01	\N	f	13	GTX TITAN Z	The best GPU available right now!	2
 9	3			\N	f	9	item for taylor		2
-10	3			\N	f	10	item 1		3
 11	3			\N	f	11	item 2		3
 12	3			\N	f	12	item 3		3
+10	3			2	f	10	item 1		3
+14	2			\N	f	14	Test		2
 \.
 
 
@@ -321,14 +388,14 @@ COPY wish_list_items (id, wish_list_id, url, image_url, covered_by_user_id, fulf
 -- Name: wish_list_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
 --
 
-SELECT pg_catalog.setval('wish_list_items_id_seq', 13, true);
+SELECT pg_catalog.setval('wish_list_items_id_seq', 14, true);
 
 
 --
 -- Name: wish_list_items_priority_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
 --
 
-SELECT pg_catalog.setval('wish_list_items_priority_seq', 13, true);
+SELECT pg_catalog.setval('wish_list_items_priority_seq', 14, true);
 
 
 --
@@ -343,6 +410,7 @@ COPY wish_lists (id, wish_list_collection_id, owner_user_id) FROM stdin;
 6	1	4
 7	7	2
 8	7	3
+11	8	2
 \.
 
 
@@ -350,7 +418,15 @@ COPY wish_lists (id, wish_list_collection_id, owner_user_id) FROM stdin;
 -- Name: wish_lists_id_seq; Type: SEQUENCE SET; Schema: public; Owner: fwl_admin
 --
 
-SELECT pg_catalog.setval('wish_lists_id_seq', 8, true);
+SELECT pg_catalog.setval('wish_lists_id_seq', 11, true);
+
+
+--
+-- Name: suggestions_pkey; Type: CONSTRAINT; Schema: public; Owner: fwl_admin; Tablespace: 
+--
+
+ALTER TABLE ONLY suggestions
+    ADD CONSTRAINT suggestions_pkey PRIMARY KEY (id);
 
 
 --
@@ -428,6 +504,14 @@ CREATE INDEX wish_lists_wish_list_collection_id_owner_user_id_idx ON wish_lists 
 
 
 --
+-- Name: suggestions_author_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fwl_admin
+--
+
+ALTER TABLE ONLY suggestions
+    ADD CONSTRAINT suggestions_author_user_id_fkey FOREIGN KEY (author_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
 -- Name: wish_list_collections_exclusive_wish_list_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fwl_admin
 --
 
@@ -491,6 +575,26 @@ REVOKE ALL ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM mike;
 GRANT ALL ON SCHEMA public TO mike;
 GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- Name: suggestions; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON TABLE suggestions FROM PUBLIC;
+REVOKE ALL ON TABLE suggestions FROM fwl_admin;
+GRANT ALL ON TABLE suggestions TO fwl_admin;
+GRANT SELECT,INSERT ON TABLE suggestions TO fwl_user;
+
+
+--
+-- Name: suggestions_id_seq; Type: ACL; Schema: public; Owner: fwl_admin
+--
+
+REVOKE ALL ON SEQUENCE suggestions_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE suggestions_id_seq FROM fwl_admin;
+GRANT ALL ON SEQUENCE suggestions_id_seq TO fwl_admin;
+GRANT USAGE ON SEQUENCE suggestions_id_seq TO fwl_user;
 
 
 --

@@ -13,7 +13,7 @@ String emailEscaped = email != null? ServletHelper.escapeHTML(email) : "";
  	<table>
 		<tr>
 			<td><label for="email">Email:</label></td>
-			<td><input type="text" name="email" required="required" value="<%=emailEscaped%>" /></td>
+			<td><input type="email" name="email" required="required" value="<%=emailEscaped%>" /></td>
 		</tr>
 		<tr>
 			<td><label for="password">Password:</label></td>

@@ -41,7 +41,7 @@ if (formData != null)
 		</tr>
 		<tr>
 			<td><label for="email">Email:</label></td>
-			<td><input type="text" name="email" value="<%=emailEscaped%>" required="required" /></td>
+			<td><input type="email" name="email" value="<%=emailEscaped%>" required="required" /></td>
 		</tr>
 		<tr>
 			<td><label for="password">Password:</label></td>
