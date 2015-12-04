@@ -13,7 +13,6 @@ User loggedInUser = (User)request.getAttribute("loggedInUser");
 		<meta name="viewport" content="width=device-width" />
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
 		
-		<title>Family Wish List</title>
 		<jsp:invoke fragment="head" />
 	</head>
 	
