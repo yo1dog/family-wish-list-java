@@ -184,6 +184,28 @@ public class WishListItem
 
 	
 	
+	public static void update(Connection cn, int wishListItemID, String name, String url, String imageURL, String description) throws SQLException
+	{
+		String query =
+			"UPDATE wish_list_items SET " +
+				"name = ?, " +
+				"url = ?," +
+				"image_url = ?," +
+				"description = ?" +
+			"WHERE id = ?";
+		
+		PreparedStatement st = cn.prepareStatement(query);
+		
+		st.setString(1, name);
+		st.setString(2, url);
+		st.setString(3, imageURL);
+		st.setString(4, description);
+		st.setInt   (5, wishListItemID);
+		
+		st.executeUpdate();
+		st.close();
+	}
+	
 	public static void setCovered(Connection cn, int itemID, int userID, boolean fulfilled) throws SQLException
 	{
 		String query =
@@ -212,6 +234,17 @@ public class WishListItem
 		
 		PreparedStatement st = cn.prepareStatement(query);
 		st.setInt(1, itemID);
+		
+		st.executeUpdate();
+		st.close();
+	}
+	
+	public static void delete(Connection cn, int wishListItemID) throws SQLException
+	{
+		String query = "DELETE FROM wish_list_items WHERE id = ?";
+		PreparedStatement st = cn.prepareStatement(query);
+		
+		st.setInt(1, wishListItemID);
 		
 		st.executeUpdate();
 		st.close();

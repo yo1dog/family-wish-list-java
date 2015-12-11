@@ -118,6 +118,15 @@ else
         var itemRow = document.getElementById("item" + itemID);
         itemRow.className = klass;
       }
+      
+  	  function submitDeleteItem(event) {
+  	    if (!confirm('Are you sure you want to delete this item?')) {
+  	      event.preventDefault();
+  	      return false;
+  	    }
+  	    
+  	    return true;
+  	  }
     </script>
   </jsp:attribute>
 </t:header>
@@ -133,6 +142,7 @@ else
       <th>Name</th>
       <th>Description</th>
       <th>Status</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -159,7 +169,7 @@ else
 	        
 	        %>
 	        <tr>
-	          <td colspan="4"><%=messageHTML%></td>
+	          <td colspan="5"><%=messageHTML%></td>
 	        </tr>
 	        <%
 	        
@@ -181,7 +191,7 @@ else
         
         %>
         <tr>
-          <td colspan="4">Added by Others</td>
+          <td colspan="5">Added by Others</td>
         </tr>
         <%
       }
@@ -254,12 +264,29 @@ else
               rowClass += " " + (isCoveredByCurrentUser? "item-user-covered-unfulfilled" : "item-covered-unfulfilled");
           }
         }
+        
+        // edit
+        String editHTML = "";
+        
         %>
         <tr id="item<%=item.id%>" class="<%=rowClass%>">
           <td><%=imageHTML%></td>
           <td><%=nameHTML%></td>
           <td><%=descriptionHTML%></td>
           <td id="itemStatusCell<%=item.id%>"><%=statusHTML%></td>
+          <td>
+	          <%
+	          	if (isLoggedInUsersWishList) {
+	          	  %>
+	          	  <a href="/item/update?wishListItemID=<%=item.id%>">Edit</a> -
+	          	  <form name="updateItemForm" method="post" action="/item/delete"  onsubmit="return submitDeleteItem(event);" style="display: inline;">
+					<input type="hidden" name="wishListItemID" value="<%=item.id%>"/>
+				    <input type="submit" value="Delete Item" />
+				  </form>
+	          	  <%
+	          	}
+	          %>
+          </td>
         </tr>
         <%
       }
