@@ -43,3 +43,14 @@ a
 {
   background-color: #FFCCCC;
 }
+
+input[type="text"]
+{
+  width: 200pt;
+}
+
+textarea
+{
+  width: 200pt;
+  height: 100pt;
+}

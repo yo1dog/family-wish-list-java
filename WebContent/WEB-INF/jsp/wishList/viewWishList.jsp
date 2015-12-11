@@ -211,13 +211,13 @@ else
           imageHTML = "<img src=\"" + ServletHelper.escapeHTML(item.imageURL) + "\" />";
           
           if (item.url.length() > 0)
-            imageHTML = "<a href=\"" + urlEscaped + "\">" + imageHTML + "</a>";
+            imageHTML = "<a href=\"" + urlEscaped + "\" target=\"_blank\">" + imageHTML + "</a>";
         }
         
         // name
         String nameHTML = ServletHelper.escapeHTML(item.name);
         if (item.url.length() > 0)
-          nameHTML = "<a href=\"" + urlEscaped + "\">" + nameHTML + "</a>";
+          nameHTML = "<a href=\"" + urlEscaped + "\" target=\"_blank\">" + nameHTML + "</a>";
         
         // description
         String descriptionHTML = "";
@@ -265,9 +265,6 @@ else
           }
         }
         
-        // edit
-        String editHTML = "";
-        
         %>
         <tr id="item<%=item.id%>" class="<%=rowClass%>">
           <td><%=imageHTML%></td>
@@ -281,7 +278,7 @@ else
 	          	  <a href="/item/update?wishListItemID=<%=item.id%>">Edit</a> -
 	          	  <form name="updateItemForm" method="post" action="/item/delete"  onsubmit="return submitDeleteItem(event);" style="display: inline;">
 					<input type="hidden" name="wishListItemID" value="<%=item.id%>"/>
-				    <input type="submit" value="Delete Item" />
+				    <input type="submit" value="Delete" />
 				  </form>
 	          	  <%
 	          	}
