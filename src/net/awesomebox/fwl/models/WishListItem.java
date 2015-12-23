@@ -22,6 +22,7 @@ public class WishListItem
 	public final int     priority;
 	
 	private User coveredByUser;
+	private User creatorUser;
 	private WishList wishList;
 	
 	private WishListItem(
@@ -76,6 +77,14 @@ public class WishListItem
 		return coveredByUser;
 	}
 	
+	public final User getCreatorUser(Connection cn) throws SQLException
+	{
+		if (creatorUser == null)
+			creatorUser = User.findByID(cn, creatorUserID);
+		
+		return creatorUser;
+	}
+	
 	public final WishList getWishList(Connection cn) throws SQLException
 	{
 		if (wishList == null)
@@ -125,14 +134,14 @@ public class WishListItem
 		return items.toArray(new WishListItem[items.size()]);
 	}
 	
-	public static final WishListItem[] findListByUnfulfilledByUser(Connection cn, int userID) throws SQLException
+	public static final WishListItem[] findListByCoveredByUser(Connection cn, int userID) throws SQLException
 	{
 		ArrayList<WishListItem> items = new ArrayList<WishListItem>();
 		
 		PreparedStatement st = cn.prepareStatement(
 			"SELECT wish_list_items.* " +
 			"FROM wish_list_items " +
-			"WHERE covered_by_user_id = ? AND fulfilled = FALSE");
+			"WHERE covered_by_user_id = ?");
 		st.setInt(1, userID);
 		
 		ResultSet rs = st.executeQuery();

@@ -1,5 +1,5 @@
-<%@page import="net.awesomebox.fwl.controllers.Home.UnfulfilledItemCollectionGroup"%>
-<%@page import="net.awesomebox.fwl.controllers.Home.UnfulfilledItemWishListGroup"%>
+<%@page import="net.awesomebox.fwl.controllers.Home.CoveredCollection"%>
+<%@page import="net.awesomebox.fwl.controllers.Home.CoveredWishList"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="net.awesomebox.fwl.models.WishListItem"%>
 <%@page import="net.awesomebox.fwl.models.WishListCollection"%>
@@ -11,7 +11,7 @@
 User loggedInUser = (User)request.getAttribute("loggedInUser");
 Connection cn = (Connection)request.getAttribute("cn");
 
-UnfulfilledItemCollectionGroup[] unfulfilledItemCollectionGroups = (UnfulfilledItemCollectionGroup[])request.getAttribute("unfulfilledItemCollectionGroups");
+CoveredCollection[] coveredCollections = (CoveredCollection[])request.getAttribute("coveredCollections");
 %>
 
 <t:header>
@@ -20,10 +20,14 @@ UnfulfilledItemCollectionGroup[] unfulfilledItemCollectionGroups = (UnfulfilledI
 	  <script type="text/javascript" src="/js/script.js"></script>
 	  
 	  <script type="text/javascript">
-      function setItemCovered(itemID) {
+	  function setItemFullfilled(itemID) {
+	    var itemCheckboxElem = document.getElementById("itemCheckbox" + itemID);
+	    
+		var fulfilled =itemCheckboxElem .checked;
+		
         setItemStatusHTML(itemID, "...");
         
-        ItemUpdater.setCovered(itemID, true, function(err) {
+        ItemUpdater.setCovered(itemID, fulfilled, function(err) {
           if (err) {
             console.error(err);
             
@@ -31,41 +35,13 @@ UnfulfilledItemCollectionGroup[] unfulfilledItemCollectionGroups = (UnfulfilledI
             return;
           }
           
-          removeItemListItem(itemID);
+          setItemStatusHTML(itemID, "");
         });
       }
-      
+  	  
       function setItemStatusHTML(itemID, html) {
         var itemStatusSpan = document.getElementById("itemStatusSpan" + itemID);
         itemStatusSpan.innerHTML = html;
-      }
-      
-      function removeItemListItem(itemID) {
-        // remove item
-        var itemLI = document.getElementById("itemListItem" + itemID);
-        var itemsUL = itemLI.parentNode;
-        
-        itemsUL.removeChild(itemLI);
-        
-        // remove wish list
-        if (itemsUL.getElementsByTagName("li").length > 0) return;
-        
-        var wishListLI = itemsUL.parentNode;
-        var wishListsUL = wishListLI.parentNode;
-        
-        wishListsUL.removeChild(wishListLI);
-        
-        // remove collection
-        if (wishListsUL.getElementsByTagName("li").length > 0) return;
-        
-        var collectionLI = wishListsUL.parentNode;
-        var collectionsUL = collectionLI.parentNode;
-        
-        collectionsUL.removeChild(collectionLI);
-      }
-      
-      function removeWishListListItem(wishListID) {
-        var wishListListItem = document.getElementById("wishListListItem" + wishListID);
       }
     </script>
   </jsp:attribute>
@@ -73,40 +49,41 @@ UnfulfilledItemCollectionGroup[] unfulfilledItemCollectionGroups = (UnfulfilledI
 
 <h2>Profile</h2>
 
-<h3>Gifts You Need to Get</h3>
-<p>These are items that you said you are going to get but you have not gotten yet. If you have gotten the item, click the <strong>I got it</strong> link to the right of the item.</p>
+<h3>Gifts Checklist</h3>
+<p>These are the gifts that you said you are going to get. Once you get the item, you can check it off.</p>
 
 <ul>
 	<%
-	for (int i = 0; i < unfulfilledItemCollectionGroups.length; ++i)
+	for (int i = 0; i < coveredCollections.length; ++i)
 	{
-		UnfulfilledItemCollectionGroup collectionGroup = unfulfilledItemCollectionGroups[i];
+		CoveredCollection coveredCollection = coveredCollections[i];
 		
 		%>
 		<li>
-		  <a href="/collection?id=<%=collectionGroup.collection.id%>"><%=ServletHelper.escapeHTML(collectionGroup.collection.name)%></a>
+		  <a href="/collection?id=<%=coveredCollection.collection.id%>"><%=ServletHelper.escapeHTML(coveredCollection.collection.name)%></a>
 		  
 		  <ul>
 			  <%
-			  for (UnfulfilledItemWishListGroup wishListGroup : collectionGroup.wishListGroups)
+			  for (CoveredWishList coveredWishList : coveredCollection.coveredWishLists)
 			  {
-				  User user = wishListGroup.wishList.getOwner(cn);
+				  User user = coveredWishList.wishList.getOwner(cn);
 				  
 				  %>
-				  <li>
-				    <span><a href="/wishlist?id=<%=wishListGroup.wishList.id%>"><%=ServletHelper.escapeHTML(user.firstName)%></a></span>
+				  <li style="margin-top: 10px;">
+				    <span><a href="/wishlist?id=<%=coveredWishList.wishList.id%>"><%=ServletHelper.escapeHTML(user.firstName)%></a></span>
 				    
 				    <ul>
 				      <%
-				      for (WishListItem item : wishListGroup.items)
+				      for (WishListItem coveredItem : coveredWishList.coveredItems)
 				      {
 				    	  %>
-				    	  <li id="itemListItem<%=item.id%>">
-				    	    <a href="/wishlist?id=<%=wishListGroup.wishList.id%>#item<%=item.id%>"><%=ServletHelper.escapeHTML(item.name)%></a>
-				    	    - <span id="itemStatusSpan<%=item.id%>"><a href="javascript:setItemCovered(<%=item.id%>);">Got it.</a></span>
-				    	  </li><%
-              }
-		          %>
+				    	  <li>
+				    	    <input type="checkbox" <%=coveredItem.fulfilled? "checked=\"checked\"": ""%> id="itemCheckbox<%=coveredItem.id%>" onChange="setItemFullfilled(<%=coveredItem.id%>);" />
+				    	    <a href="/wishlist?id=<%=coveredItem.wishListID%>#item<%=coveredItem.id%>"><%=ServletHelper.escapeHTML(coveredItem.name)%></a> <span id="itemStatusSpan<%=coveredItem.id%>"></span>
+				    	  </li>
+				    	  <%
+                      }
+					  %>
 				    </ul>
 				  </li>
 				  <%

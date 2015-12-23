@@ -208,7 +208,7 @@ else
         String imageHTML = "";
         if (item.imageURL.length() > 0)
         {
-          imageHTML = "<img src=\"" + ServletHelper.escapeHTML(item.imageURL) + "\" />";
+          imageHTML = "<img class=\"item-img\" src=\"" + ServletHelper.escapeHTML(item.imageURL) + "\" />";
           
           if (item.url.length() > 0)
             imageHTML = "<a href=\"" + urlEscaped + "\" target=\"_blank\">" + imageHTML + "</a>";
@@ -273,13 +273,18 @@ else
           <td id="itemStatusCell<%=item.id%>"><%=statusHTML%></td>
           <td>
 	          <%
-	          	if (isLoggedInUsersWishList) {
+	          	if (item.creatorUserID == loggedInUser.id) {
 	          	  %>
 	          	  <a href="/item/update?wishListItemID=<%=item.id%>">Edit</a> -
 	          	  <form name="updateItemForm" method="post" action="/item/delete"  onsubmit="return submitDeleteItem(event);" style="display: inline;">
 					<input type="hidden" name="wishListItemID" value="<%=item.id%>"/>
 				    <input type="submit" value="Delete" />
 				  </form>
+	          	  <%
+	          	}
+	          	else if (item.creatorUserID != wishListOwner.id) {
+	          	  %>
+	          	  <small>Added by <%=item.getCreatorUser(cn).firstName%></small>
 	          	  <%
 	          	}
 	          %>

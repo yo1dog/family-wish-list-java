@@ -11,6 +11,7 @@ table
 a
 {
 	text-decoration: none;
+	color: blue;
 }
 
 .wishlist th, .wishlist td
@@ -21,7 +22,7 @@ a
 }
 
 
-.item img
+.item-img
 {
   max-width: 64px;
   max-height: 64px;
@@ -53,4 +54,9 @@ textarea
 {
   width: 200pt;
   height: 100pt;
+}
+
+#formErrorMessage
+{
+  color: red;
 }

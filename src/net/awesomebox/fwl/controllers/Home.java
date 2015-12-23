@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,67 +32,97 @@ public class Home extends FWLPageManagedHttpServlet
 			request.getRequestDispatcher("/WEB-INF/jsp/auth/login.jsp").forward(request, response);
 		else
 		{
-			// get the items the logged-in user has covered but not fulfilled
+			// get the items the logged-in user has covered
 			Connection cn = getDatabaseConnection(request);
 			
-			WishListItem[] items = WishListItem.findListByUnfulfilledByUser(cn, loggedInUser.id);
+			WishListItem[] covereditems = WishListItem.findListByCoveredByUser(cn, loggedInUser.id);
 			
 			// group items into wish lists
-			ArrayList<UnfulfilledItemWishListGroup> wishListGroups = new ArrayList<UnfulfilledItemWishListGroup>();
+			ArrayList<CoveredWishList> coveredWishLists = new ArrayList<CoveredWishList>();
 			
-			for (int i = 0; i < items.length; ++i)
+			for (int i = 0; i < covereditems.length; ++i)
 			{
-				UnfulfilledItemWishListGroup wishListGroup = null;
-				for (UnfulfilledItemWishListGroup _wishListGroup : wishListGroups)
+				CoveredWishList coveredWishList = null;
+				for (CoveredWishList _coveredWishList : coveredWishLists)
 				{
-					if (items[i].wishListID == _wishListGroup.wishList.id)
+					if (covereditems[i].wishListID == _coveredWishList.wishList.id)
 					{
-						wishListGroup = _wishListGroup;
+						coveredWishList = _coveredWishList;
 						break;
 					}
 				}
 				
-				if (wishListGroup == null)
+				if (coveredWishList == null)
 				{
-					WishList wishList = WishList.findByID(cn, items[i].wishListID);
-					wishListGroup = new UnfulfilledItemWishListGroup(wishList);
+					WishList wishList = WishList.findByID(cn, covereditems[i].wishListID);
+					coveredWishList = new CoveredWishList(wishList);
 					
-					wishListGroups.add(wishListGroup);
+					coveredWishLists.add(coveredWishList);
 				}
 				
-				wishListGroup.items.add(items[i]);
+				coveredWishList.coveredItems.add(covereditems[i]);
 			}
 			
 			
 			// group wish lists into collections
-			ArrayList<UnfulfilledItemCollectionGroup> collectionGroups = new ArrayList<UnfulfilledItemCollectionGroup>();
+			ArrayList<CoveredCollection> coveredCollections = new ArrayList<CoveredCollection>();
 			
-			for (UnfulfilledItemWishListGroup wishListGroup : wishListGroups)
+			for (CoveredWishList coveredWishList : coveredWishLists)
 			{
-				UnfulfilledItemCollectionGroup collectionGroup = null;
-				for (UnfulfilledItemCollectionGroup _collectionGroup : collectionGroups)
+				CoveredCollection coveredCollection = null;
+				for (CoveredCollection _coveredCollection : coveredCollections)
 				{
-					if (wishListGroup.wishList.wishListCollectionID == _collectionGroup.collection.id)
+					if (coveredWishList.wishList.wishListCollectionID == _coveredCollection.collection.id)
 					{
-						collectionGroup = _collectionGroup;
+						coveredCollection = _coveredCollection;
 						break;
 					}
 				}
 				
-				if (collectionGroup == null)
+				if (coveredCollection == null)
 				{
-					WishListCollection collection = WishListCollection.findByID(cn, wishListGroup.wishList.wishListCollectionID);
-					collectionGroup = new UnfulfilledItemCollectionGroup(collection);
+					WishListCollection collection = WishListCollection.findByID(cn, coveredWishList.wishList.wishListCollectionID);
+					coveredCollection = new CoveredCollection(collection);
 					
-					collectionGroups.add(collectionGroup);
+					coveredCollections.add(coveredCollection);
 				}
 				
-				collectionGroup.wishListGroups.add(wishListGroup);
+				coveredCollection.coveredWishLists.add(coveredWishList);
+			}
+			
+			// sort the covered collections
+			coveredCollections.sort(new Comparator<CoveredCollection>()
+			{
+				public int compare(CoveredCollection a, CoveredCollection b) {
+					return a.collection.id - b.collection.id;
+				}
+			});
+			
+			for (CoveredCollection coveredCollection : coveredCollections)
+			{
+				// sort the covered wish lists
+				coveredCollection.coveredWishLists.sort(new Comparator<CoveredWishList>()
+				{
+					public int compare(CoveredWishList a, CoveredWishList b) {
+						return a.wishList.id - b.wishList.id;
+					}
+				});
+				
+				for (CoveredWishList coveredWishList : coveredCollection.coveredWishLists)
+				{
+					// sort the covered items
+					coveredWishList.coveredItems.sort(new Comparator<WishListItem>()
+					{
+						public int compare(WishListItem a, WishListItem b) {
+							return a.priority - b.priority;
+						}
+					});
+				}
 			}
 			
 			
 			request.setAttribute("cn", cn);
-			request.setAttribute("unfulfilledItemCollectionGroups", collectionGroups.toArray(new UnfulfilledItemCollectionGroup[collectionGroups.size()]));
+			request.setAttribute("coveredCollections", coveredCollections.toArray(new CoveredCollection[coveredCollections.size()]));
 			request.getRequestDispatcher("/WEB-INF/jsp/user/profile.jsp").forward(request, response);
 		}
 	}
@@ -99,27 +130,27 @@ public class Home extends FWLPageManagedHttpServlet
 	
 	
 	
-	public static final class UnfulfilledItemCollectionGroup
+	public static final class CoveredCollection
 	{
 		public final WishListCollection collection;
-		public final ArrayList<UnfulfilledItemWishListGroup> wishListGroups;
+		public final ArrayList<CoveredWishList> coveredWishLists;
 		
-		UnfulfilledItemCollectionGroup(WishListCollection collection)
+		CoveredCollection(WishListCollection collection)
 		{
 			this.collection = collection;
-			this.wishListGroups = new ArrayList<UnfulfilledItemWishListGroup>();
+			this.coveredWishLists = new ArrayList<CoveredWishList>();
 		}
 	}
 	
-	public static final class UnfulfilledItemWishListGroup
+	public static final class CoveredWishList
 	{
 		public final WishList wishList;
-		public final ArrayList<WishListItem> items;
+		public final ArrayList<WishListItem> coveredItems;
 		
-		UnfulfilledItemWishListGroup(WishList wishList)
+		CoveredWishList(WishList wishList)
 		{
 			this.wishList = wishList;
-			this.items = new ArrayList<WishListItem>();
+			this.coveredItems = new ArrayList<WishListItem>();
 		}
 	}
 }

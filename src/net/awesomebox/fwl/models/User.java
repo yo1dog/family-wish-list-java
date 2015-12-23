@@ -137,6 +137,32 @@ public class User
 		}
 	}
 	
+	/**
+	 * Updates the user's password and returns the ID of the user.
+	 * 
+	 * @param cn
+	 * @param email
+	 * @param passwordHash
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int updatePassword(Connection cn, String email, byte[] passwordHash) throws SQLException
+	{
+		String query = "UPDATE users SET password_hash = ? WHERE email = ? RETURNING id";
+		PreparedStatement st = cn.prepareStatement(query);
+		
+		st.setBytes (1, passwordHash);
+		st.setString(2, email);
+		
+		ResultSet rs = st.executeQuery();
+		int userID = rs.next()? rs.getInt(1) : -1;
+		
+		rs.close();
+		st.close();
+		
+		return userID;
+	}
+	
 	
 	public static boolean lookupIsMemeberOfCollection(Connection cn, int userID, int collectionID) throws SQLException
 	{
