@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 
-<Context antiJARLocking="true" path="/fwl" allowLinking="true" aliases="/data=/etc/fwl" sessionCookiePath="/">
-
+<Context sessionCookiePath="/">
+	<Resources allowLinking="true">
+	  <PreResources className="org.apache.catalina.webresources.DirResourceSet" base="/etc/fwl" webAppMount="/data" />
+	</Resources>
 	<Resource name="jdbc/postgres" auth="Container"
 		type="javax.sql.DataSource"
 		driverClassName="org.postgresql.Driver"

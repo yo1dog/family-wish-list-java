@@ -3,7 +3,6 @@
 	<name>familyWishList</name>
 	<comment></comment>
 	<projects>
-		<project>ServletManager</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
