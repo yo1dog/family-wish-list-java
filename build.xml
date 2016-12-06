@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<project name="${ant.project.name}" default="build-war">
+<project name="${project_name}" default="build-war">
 	
 	<!-- Build -->
 	
-	<property name="war-name" value="${ant.project.name}.war" />
+	<property name="war-name" value="${project_name}.war" />
 	
 	<target name="build-war">
 		<war destfile="build/${war-name}" webxml="WebContent/WEB-INF/web.xml">
 			<fileset dir="WebContent" />
-			<fileset dir="src" /> 
-			<classes dir="build/classes" /> 
+			<fileset dir="src" />
+			<classes dir="build/classes" />
 		</war>
 	</target>
 	
 	
 	<!-- Remote Deploy -->
 	
-	<property name="ssh-host"     value="awesomebox.net" />
+	<property name="ssh-host"     value="yo1.dog" />
 	<property name="ssh-username" value="mike" />
-	<property name="ssh-password" value="" />
-	<property name="ssh-keyfile"  value="~/.ssh/mike_AwesomeBox.pem" />
+	<property name="ssh-keyfile"  value="~/.ssh/awsSSHKeyPair-awesomebox2.pem" />
+	<property name="webapps-dir"  value="~/tomcat/webapps/" />
 	
 
 	<target name="remote-deploy" depends="build-war">
-		<scp file="build/${war-name}" todir="${ssh-username}:${ssh-password}@${ssh-host}:~/" keyfile="${ssh-keyfile}" />
+		<scp file="build/${war-name}" todir="${ssh-username}@${ssh-host}:~/" keyfile="${ssh-keyfile}" />
 		
-		<sshexec host="${ssh-host}" username="${ssh-username}" password="${ssh-password}" keyfile="${ssh-keyfile}"
-			usepty="true" command="sudo mv ~/${war-name} ~/tomcat/webapps/" />
+		<sshexec host="${ssh-host}" username="${ssh-username}" keyfile="${ssh-keyfile}"
+			usepty="true" command="sudo mv ~/${war-name} ${webapps-dir}" />
 	</target>
 	
 	
