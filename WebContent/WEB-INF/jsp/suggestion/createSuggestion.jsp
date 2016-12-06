@@ -46,8 +46,8 @@ for (int i = 0; i < suggestions.length; ++i)
 {
 	Suggestion suggestion = suggestions[i];
 	
-	User   author            = suggestion.getAuthor(cn);
-	String authorNameEscaped = ServletHelper.escapeHTML(author.firstName);
+	User author = suggestion.getAuthor(cn);
+	String authorNameEscaped = ServletHelper.escapeHTML(author != null? author.firstName : "Anon");
 	String suggestionHTML    = ServletHelper.newlinesToBR(ServletHelper.escapeHTML(suggestion.text));
 	
 	%><li><strong><%=authorNameEscaped%></strong>: <%=suggestionHTML%></li><%

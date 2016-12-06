@@ -44,7 +44,7 @@ public class Suggestion
 	
 	public final User getAuthor(Connection cn) throws SQLException
 	{
-		if (author == null)
+		if (authorUserID != null && author == null)
 			author = User.findByID(cn, authorUserID);
 		
 		return author;
