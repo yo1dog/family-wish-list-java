@@ -23,7 +23,7 @@ CoveredCollection[] coveredCollections = (CoveredCollection[])request.getAttribu
 	  function setItemFullfilled(itemID) {
 	    var itemCheckboxElem = document.getElementById("itemCheckbox" + itemID);
 	    
-		var fulfilled =itemCheckboxElem .checked;
+		var fulfilled = itemCheckboxElem.checked;
 		
         setItemStatusHTML(itemID, "...");
         
@@ -64,29 +64,45 @@ CoveredCollection[] coveredCollections = (CoveredCollection[])request.getAttribu
 		  
 		  <ul>
 			  <%
-			  for (CoveredWishList coveredWishList : coveredCollection.coveredWishLists)
+			  if (coveredCollection.collection.exclusiveWishListID != null)
 			  {
-				  User user = coveredWishList.wishList.getOwner(cn);
-				  
-				  %>
-				  <li style="margin-top: 10px;">
-				    <span><a href="/wishlist?id=<%=coveredWishList.wishList.id%>"><%=ServletHelper.escapeHTML(user.firstName)%></a></span>
-				    
-				    <ul>
-				      <%
-				      for (WishListItem coveredItem : coveredWishList.coveredItems)
-				      {
-				    	  %>
-				    	  <li>
-				    	    <input type="checkbox" <%=coveredItem.fulfilled? "checked=\"checked\"": ""%> id="itemCheckbox<%=coveredItem.id%>" onChange="setItemFullfilled(<%=coveredItem.id%>);" />
-				    	    <a href="/wishlist?id=<%=coveredItem.wishListID%>#item<%=coveredItem.id%>"><%=ServletHelper.escapeHTML(coveredItem.name)%></a> <span id="itemStatusSpan<%=coveredItem.id%>"></span>
-				    	  </li>
-				    	  <%
-                      }
+				  CoveredWishList coveredWishList = coveredCollection.coveredWishLists.get(0);
+			      for (WishListItem coveredItem : coveredWishList.coveredItems)
+			      {
+			    	  %>
+			    	  <li>
+			    	    <input type="checkbox" <%=coveredItem.fulfilled? "checked=\"checked\"": ""%> id="itemCheckbox<%=coveredItem.id%>" onChange="setItemFullfilled(<%=coveredItem.id%>);" />
+			    	    <a href="/wishlist?id=<%=coveredItem.wishListID%>#item<%=coveredItem.id%>"><%=ServletHelper.escapeHTML(coveredItem.name)%></a> <span id="itemStatusSpan<%=coveredItem.id%>"></span>
+			    	  </li>
+			    	  <%
+                  }
+			  }
+			  else
+			  {
+				  for (CoveredWishList coveredWishList : coveredCollection.coveredWishLists)
+				  {
+					  User user = coveredWishList.wishList.getOwner(cn);
+					  
 					  %>
-				    </ul>
-				  </li>
-				  <%
+					  <li style="margin-top: 10px;">
+					    <span><a href="/wishlist?id=<%=coveredWishList.wishList.id%>"><%=ServletHelper.escapeHTML(user.firstName)%></a></span>
+					    
+					    <ul>
+					      <%
+					      for (WishListItem coveredItem : coveredWishList.coveredItems)
+					      {
+					    	  %>
+					    	  <li>
+					    	    <input type="checkbox" <%=coveredItem.fulfilled? "checked=\"checked\"": ""%> id="itemCheckbox<%=coveredItem.id%>" onChange="setItemFullfilled(<%=coveredItem.id%>);" />
+					    	    <a href="/wishlist?id=<%=coveredItem.wishListID%>#item<%=coveredItem.id%>"><%=ServletHelper.escapeHTML(coveredItem.name)%></a> <span id="itemStatusSpan<%=coveredItem.id%>"></span>
+					    	  </li>
+					    	  <%
+	                      }
+						  %>
+					    </ul>
+					  </li>
+					  <%
+				  }
 			  }
 			  %>
 		  </ul>

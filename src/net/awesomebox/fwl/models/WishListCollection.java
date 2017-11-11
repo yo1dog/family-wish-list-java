@@ -14,6 +14,7 @@ public class WishListCollection
 	public final int     ownerUserID;
 	public final String  name;
 	public final Integer exclusiveWishListID;
+	public final boolean isHidden;
 	
 	private WishList[] wishLists;
 	
@@ -22,13 +23,15 @@ public class WishListCollection
 		int     id,
 		int     ownerUserID,
 		String  name,
-		Integer exclusiveWishListID
+		Integer exclusiveWishListID,
+		boolean isHidden
 	)
 	{
 		this.id                  = id;
 		this.ownerUserID         = ownerUserID;
 		this.name                = name;
 		this.exclusiveWishListID = exclusiveWishListID;
+		this.isHidden            = isHidden;
 	}
 	
 	private WishListCollection(ResultSet rs) throws SQLException
@@ -37,7 +40,8 @@ public class WishListCollection
 			rs.getInt   (       "id"),
 			rs.getInt   (       "owner_user_id"),
 			rs.getString(       "name"),
-			Database.gnvInt(rs, "exclusive_wish_list_id")
+			Database.gnvInt(rs, "exclusive_wish_list_id"),
+			rs.getBoolean(      "is_hidden")
 		);
 	}
 	
@@ -88,7 +92,7 @@ public class WishListCollection
 	{
 		ArrayList<WishListCollection> collections = new ArrayList<WishListCollection>();
 		
-		PreparedStatement st = cn.prepareStatement("SELECT * FROM wish_list_collections ORDER BY id DESC");
+		PreparedStatement st = cn.prepareStatement("SELECT * FROM wish_list_collections ORDER BY is_hidden ASC, id DESC");
 		ResultSet rs = st.executeQuery();
 		
 		while(rs.next())

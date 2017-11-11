@@ -1,10 +1,10 @@
 package net.awesomebox.fwl.controllers;
 
+import java.io.Console;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -90,33 +90,21 @@ public class Home extends FWLPageManagedHttpServlet
 				coveredCollection.coveredWishLists.add(coveredWishList);
 			}
 			
+			// remove hidden collections
+			coveredCollections.removeIf(coveredCollection -> coveredCollection.collection.isHidden);
+			
 			// sort the covered collections
-			coveredCollections.sort(new Comparator<CoveredCollection>()
-			{
-				public int compare(CoveredCollection a, CoveredCollection b) {
-					return a.collection.id - b.collection.id;
-				}
-			});
+			coveredCollections.sort((a, b) -> a.collection.id - b.collection.id);
 			
 			for (CoveredCollection coveredCollection : coveredCollections)
 			{
 				// sort the covered wish lists
-				coveredCollection.coveredWishLists.sort(new Comparator<CoveredWishList>()
-				{
-					public int compare(CoveredWishList a, CoveredWishList b) {
-						return a.wishList.id - b.wishList.id;
-					}
-				});
+				coveredCollection.coveredWishLists.sort((a, b) -> a.wishList.id - b.wishList.id);
 				
 				for (CoveredWishList coveredWishList : coveredCollection.coveredWishLists)
 				{
 					// sort the covered items
-					coveredWishList.coveredItems.sort(new Comparator<WishListItem>()
-					{
-						public int compare(WishListItem a, WishListItem b) {
-							return a.priority - b.priority;
-						}
-					});
+					coveredWishList.coveredItems.sort((a, b) -> a.priority - b.priority);
 				}
 			}
 			
